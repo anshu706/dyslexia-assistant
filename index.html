@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Dyslexia Assistant System - Reading made easy">
+    <meta name="theme-color" content="#1F2937">
+
+    <title> Dyslexia Assistant </title>
+
+    <!-- Stylesheets-->
+    <link rel="stylesheet" href="css/animations.css">
+    <link rel="stylesheet" href="css/dyslexia.css">
+    <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/themes.css">
+
+    <!-- Manifest for PWA -->
+    <link rel="manifest" href="manifest.json">
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml, <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75' font-weight='bold' fill='%234F46E5'>D</text></svg>">
+
+</head>
+<body>
+
+    <div class="app-shell"> 
+        <!-- HEADER -->
+         <header class="header">
+            <div class="header-content">
+                <div class="logo">
+                    <span class="logo-icon">📖</span>
+                    <span class=""logo-text">Dyslexia Assistant</span>
+                </div>
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
+                    <span class="icon">🌙</span>
+                </button>
+            </div>
+         </header>
+
+
+        <!-- NAVIGATION -->
+         <nav class="nav-tabs">
+            <button class="nav-tab active" data-tab="home">Home</button>
+            <button class="nav-tab" data-tab="reader">Reader</button>
+            <button class="nav-tab" data-tab="settings">Settings</button>
+         </nav>
+        
+        <!-- MAIN CONTENT -->
+         <main class="main-content">
+            <!-- HOME PAGE -->
+             <section id="home" class="page active">
+                <div class="container">
+                    <h1>Welcome to Dyslexia Assistant</h1>
+                    <p class="subtitle">A Tool specially Designed for dyslexia students</p>
+
+                    <div class="hero-section">
+                        <div class="feature-card">
+                            <div class="feature-icon">📤</div>
+                                <h3>Upload Documents</h3>
+                                <p>Upload PDF, DOCX, or TXT files</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🎵</div>
+                            <h3>Text-to-Speech</h3>
+                            <p>Hear text read aloud naturally</p>
+                        </div>
+                        <div class="feature-card">
+                            <div class="feature-icon">🎨</div>
+                            <h3>Dyslexia Settings</h3>
+                            <p>Customize fonts, spacing, colors</p>
+                        </div>
+                    </div>
+
+                    <div class="upload-area" id="uploadArea">
+                        <input type="file" id="fileInput" accept=".pdf, .docx, .txt" style="display:none">
+                        <div class="upload-content">
+                            <div class="upload-icon">📄</div>
+                            <h2>Upload Your Document</h2>
+                            <p>Click to select or drag & drop</p>
+                            <p class="text-muted">PDF, DOCX, or TXT (Max 10MB)</p>
+                        </div>
+                    </div>
+
+                    <button class="btn-primary" id="getStartedbtn">Get Started</button>
+                </div>
+             </section>
+         </main>
+        
+        <!-- READER PAGE -->
+
+        <section id="reader" class="page">
+            <div class="reader-container">
+                <div class="reader-header">
+                    <h2 id="docTitle">Document Title</h2>
+                    <button class="btn-close" data-tab="home">✕</button>
+                </div>
+
+                <div class="reader-header">
+                    
+                </div>
+
+            </div>
+        </section>
+
+        <!-- SETTINGS PAGE -->
+
+    </div>
+
+    <!-- Scripts -->
+     <script src="js/app.js"></script>
+     <script src="js/utils.js"></script>
+
+</body>
+</html>
