@@ -93,10 +93,19 @@
                     <button class="btn-close" data-tab="home">✕</button>
                 </div>
 
-                <div class="reader-header">
-                    
+                <div class="reader-controls">
+                    <button class="btn-icon" id="ttsPlayBtn" title="Play/Pause">▶</button>
+                    <input type="range" id="ttsSpeed" min="0.5" max="2" step="0.1" value="1" title="Speed">
+                    <button class="btn-icon" id="ttsStopBtn" title="Stop">⏹</button>
+                    <span class="spacer"></span>
+                    <button class="btn-icon" id="highlightBtn" title="Highlight">🖍</button>
+                    <button class="btn-icon" id="noteBtn" title="Add Note">📝</button>
+                    <button class="btn-icon" id="bookmarkBtn" title="Bookmark">⭐</button>
                 </div>
 
+                <div class="text-display" id="textDisplay">
+                    <p>Your Document will appear here</p>
+                </div>
             </div>
         </section>
 
