@@ -1,0 +1,116 @@
+/* ANIMATIONS & MICRO-INTERACTIONS */
+
+@keyframes fadeIn {
+    from {
+        opacity: 0;
+        transform: translateY(10px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+@keyframes pulse {
+    0%, 100% {
+        opacity: 1;
+    }
+    50% {
+        opacity: 0.5;
+    }
+}
+
+@keyframes bounce {
+    0%, 100% {
+        transform: translateY(0);
+    }
+    50% {
+        transform: translateY(-5px);
+    }
+}
+
+/* Button animations */
+.btn-primary {
+    animation: fadeIn 0.3s ease;
+}
+
+.btn-primary:active {
+    transform: scale(0.98);
+}
+
+/* Tab animations */
+.nav-tab {
+    position: relative;
+}
+
+.nav-tab::after {
+    content: '';
+    position: absolute;
+    bottom: -3px;
+    left: 0;
+    width: 0;
+    height: 3px;
+    background: var(--accent);
+    transition: width 0.3s ease;
+}
+
+.nav-tab.active::after {
+    width: 100%;
+}
+
+/* Page transitions */
+.page {
+    animation: fadeIn 0.3s ease;
+}
+
+/* Hover effects */
+.feature-card,
+.btn-icon,
+.upload-area {
+    transition: all 0.3s ease;
+}
+
+/* Loading animation */
+@keyframes shimmer {
+    0% {
+        background-position: -1000px 0;
+    }
+    100% {
+        background-position: 1000px 0;
+    }
+}
+
+.loading {
+    animation: shimmer 2s infinite;
+    background: linear-gradient(90deg, var(--bg-secondary), var(--bg-primary), var(--bg-secondary));
+    background-size: 1000px 100%;
+}
+
+/* Smooth scrolling */
+html {
+    scroll-behavior: smooth;
+}
+
+/* Input focus */
+input:focus,
+select:focus,
+textarea:focus {
+    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
+}
+
+/* Disabled state */
+button:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
