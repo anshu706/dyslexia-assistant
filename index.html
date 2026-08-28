@@ -5,57 +5,54 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Dyslexia Assistant System - Reading made easy">
     <meta name="theme-color" content="#1F2937">
-
-    <title> Dyslexia Assistant </title>
-
-    <!-- Stylesheets-->
-    <link rel="stylesheet" href="css/animations.css">
-    <link rel="stylesheet" href="css/dyslexia.css">
+    
+    <title>Dyslexia Assistant</title>
+    
+    <!-- Stylesheets -->
     <link rel="stylesheet" href="css/main.css">
+    <link rel="stylesheet" href="css/dyslexia.css">
     <link rel="stylesheet" href="css/themes.css">
-
+    <link rel="stylesheet" href="css/animations.css">
+    
     <!-- Manifest for PWA -->
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml, <svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75' font-weight='bold' fill='%234F46E5'>D</text></svg>">
-
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75' font-weight='bold' fill='%234F46E5'>D</text></svg>">
 </head>
 <body>
-
-    <div class="app-shell"> 
+    <div class="app-shell">
         <!-- HEADER -->
-         <header class="header">
+        <header class="header">
             <div class="header-content">
                 <div class="logo">
                     <span class="logo-icon">📖</span>
-                    <span class=""logo-text">Dyslexia Assistant</span>
+                    <span class="logo-text">Dyslexia Assistant</span>
                 </div>
                 <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
                     <span class="icon">🌙</span>
                 </button>
             </div>
-         </header>
-
+        </header>
 
         <!-- NAVIGATION -->
-         <nav class="nav-tabs">
+        <nav class="nav-tabs">
             <button class="nav-tab active" data-tab="home">Home</button>
             <button class="nav-tab" data-tab="reader">Reader</button>
             <button class="nav-tab" data-tab="settings">Settings</button>
-         </nav>
-        
+        </nav>
+
         <!-- MAIN CONTENT -->
-         <main class="main-content">
+        <main class="main-content">
             <!-- HOME PAGE -->
-             <section id="home" class="page active">
+            <section id="home" class="page active">
                 <div class="container">
                     <h1>Welcome to Dyslexia Assistant</h1>
-                    <p class="subtitle">A Tool specially Designed for dyslexia students</p>
-
+                    <p class="subtitle">A premium reading tool designed for dyslexic students</p>
+                    
                     <div class="hero-section">
                         <div class="feature-card">
                             <div class="feature-icon">📤</div>
-                                <h3>Upload Documents</h3>
-                                <p>Upload PDF, DOCX, or TXT files</p>
+                            <h3>Upload Documents</h3>
+                            <p>Upload PDF, DOCX, or TXT files</p>
                         </div>
                         <div class="feature-card">
                             <div class="feature-icon">🎵</div>
@@ -70,7 +67,7 @@
                     </div>
 
                     <div class="upload-area" id="uploadArea">
-                        <input type="file" id="fileInput" accept=".pdf, .docx, .txt" style="display:none">
+                        <input type="file" id="fileInput" accept=".pdf,.docx,.txt" style="display:none">
                         <div class="upload-content">
                             <div class="upload-icon">📄</div>
                             <h2>Upload Your Document</h2>
@@ -79,43 +76,94 @@
                         </div>
                     </div>
 
-                    <button class="btn-primary" id="getStartedbtn">Get Started</button>
+                    <button class="btn-primary" id="getStartedBtn">Get Started</button>
                 </div>
-             </section>
-         </main>
-        
-        <!-- READER PAGE -->
+            </section>
 
-        <section id="reader" class="page">
-            <div class="reader-container">
-                <div class="reader-header">
-                    <h2 id="docTitle">Document Title</h2>
-                    <button class="btn-close" data-tab="home">✕</button>
+            <!-- READER PAGE -->
+            <section id="reader" class="page">
+                <div class="reader-container">
+                    <div class="reader-header">
+                        <h2 id="docTitle">Document Title</h2>
+                        <button class="btn-close" data-tab="home">✕</button>
+                    </div>
+                    
+                    <div class="reader-controls">
+                        <button class="btn-icon" id="ttsPlayBtn" title="Play/Pause">▶</button>
+                        <input type="range" id="ttsSpeed" min="0.5" max="2" step="0.1" value="1" title="Speed">
+                        <button class="btn-icon" id="ttsStopBtn" title="Stop">⏹</button>
+                        <span class="spacer"></span>
+                        <button class="btn-icon" id="highlightBtn" title="Highlight">🖍</button>
+                        <button class="btn-icon" id="noteBtn" title="Add Note">📝</button>
+                        <button class="btn-icon" id="bookmarkBtn" title="Bookmark">⭐</button>
+                    </div>
+
+                    <div class="text-display" id="textDisplay">
+                        <p>Your document will appear here</p>
+                    </div>
                 </div>
+            </section>
 
-                <div class="reader-controls">
-                    <button class="btn-icon" id="ttsPlayBtn" title="Play/Pause">▶</button>
-                    <input type="range" id="ttsSpeed" min="0.5" max="2" step="0.1" value="1" title="Speed">
-                    <button class="btn-icon" id="ttsStopBtn" title="Stop">⏹</button>
-                    <span class="spacer"></span>
-                    <button class="btn-icon" id="highlightBtn" title="Highlight">🖍</button>
-                    <button class="btn-icon" id="noteBtn" title="Add Note">📝</button>
-                    <button class="btn-icon" id="bookmarkBtn" title="Bookmark">⭐</button>
+            <!-- SETTINGS PAGE -->
+            <section id="settings" class="page">
+                <div class="container">
+                    <h2>Settings</h2>
+                    
+                    <div class="settings-group">
+                        <h3>Font Settings</h3>
+                        <div class="setting-item">
+                            <label for="fontFamily">Font Family</label>
+                            <select id="fontFamily">
+                                <option value="system">System Default</option>
+                                <option value="opendyslexic">OpenDyslexic</option>
+                                <option value="atkinson">Atkinson Hyperlegible</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-item">
+                            <label for="fontSize">Font Size</label>
+                            <input type="range" id="fontSize" min="14" max="32" step="2" value="18">
+                            <span id="fontSizeDisplay">18px</span>
+                        </div>
+
+                        <div class="setting-item">
+                            <label for="lineHeight">Line Height</label>
+                            <input type="range" id="lineHeight" min="1.2" max="2.5" step="0.1" value="1.8">
+                            <span id="lineHeightDisplay">1.8</span>
+                        </div>
+
+                        <div class="setting-item">
+                            <label for="letterSpacing">Letter Spacing</label>
+                            <input type="range" id="letterSpacing" min="0" max="0.5" step="0.05" value="0.15">
+                            <span id="letterSpacingDisplay">0.15em</span>
+                        </div>
+                    </div>
+
+                    <div class="settings-group">
+                        <h3>Display Settings</h3>
+                        <div class="setting-item">
+                            <label for="theme">Color Theme</label>
+                            <select id="theme">
+                                <option value="light">Light</option>
+                                <option value="dark">Dark</option>
+                                <option value="auto">Auto (System)</option>
+                            </select>
+                        </div>
+
+                        <div class="setting-item">
+                            <label for="contrast">High Contrast</label>
+                            <input type="checkbox" id="contrast">
+                        </div>
+                    </div>
+
+                    <button class="btn-primary" id="saveSettingsBtn">Save Settings</button>
                 </div>
-
-                <div class="text-display" id="textDisplay">
-                    <p>Your Document will appear here</p>
-                </div>
-            </div>
-        </section>
-
-        <!-- SETTINGS PAGE -->
-
+            </section>
+        </main>
     </div>
 
     <!-- Scripts -->
-     <script src="js/app.js"></script>
-     <script src="js/utils.js"></script>
-
+    <script src="js/utils.js"></script>
+    <script src="js/app.js"></script>
 </body>
 </html>
