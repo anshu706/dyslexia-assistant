@@ -76,7 +76,13 @@
                         </div>
                     </div>
 
-                    <button class="btn-primary" id="getStartedBtn">Get Started</button>
+                    <div style="display: flex; gap: var(--gap-md); margin-bottom: var(--pad-xl);">
+                        <button class="btn-primary" id="textInputBtn" style="flex: 1;">✏️ Paste Text</button>
+                    </div>
+
+                    <h2 style="margin-top: var(--pad-xl); margin-bottom: var(--gap-lg);">📚 My Documents</h2>
+                    <div id="documentsList"></div>
+                                        
                 </div>
             </section>
 
@@ -164,6 +170,8 @@
 
     <!-- Scripts -->
     <script src="js/utils.js"></script>
+    <script src="js/file-handler.js"></script>
+    <script src="js/storage.js"></script>
     <script src="js/app.js"></script>
 </body>
 </html>
