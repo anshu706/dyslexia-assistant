@@ -6,6 +6,7 @@ class DyslexiaAssistant {
         this.fileHandler = new FileHandler();
         this.storage = new StorageManager();
         this.settings = this.storage.getSettings();
+        this.tts = this.TextToSpeech();
         this.init();
     }
 
@@ -14,6 +15,7 @@ class DyslexiaAssistant {
         this.setupEventListeners();
         this.applySettings();
         this.displayDocuments();
+        this.initializeTTS();
         this.registerServiceWorker();
     }
 
@@ -24,6 +26,22 @@ class DyslexiaAssistant {
                 const pages = ['home', 'reader', 'settings'];
                 this.switchPage(pages[index]);
             });
+            // TTS Controls
+            document.getElementById('ttsPlayBtn').addEventListener('click', () => this.toggleTTS());
+            document.getElementById('ttsStopBtn').addEventListener('click', () => this.stopTTS());
+            document.getElementById('ttsSpeed').addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                this.tts.setRate(value);
+                document.getElementById('ttsSpeedDisplay').textContent = value.toFixed(1) + 'x';
+            });
+            document.getElementById('ttsPitch').addEventListener('input', (e) => {
+                const value = parseFloat(e.target.value);
+                this.tts.setPitch(value);
+                document.getElementById('ttsPitchDisplay').textContent = value.toFixed(1);
+            });
+            document.getElementById('ttsVoice').addEventListener('change', (e) => {
+                this.tts.setVoice(parseInt(e.target.value));
+            });            
         });
 
         // Theme toggle
@@ -152,12 +170,22 @@ class DyslexiaAssistant {
             document.getElementById('docTitle').textContent = doc.name;
             document.getElementById('textDisplay').innerHTML = this.formatContent(doc.content);
             
+            // Stop any ongoing speech
+            this.stopTTS();
+            
+            // Reset TTS utterances so new text can be prepared
+            this.tts.utterances = [];
+            document.getElementById('ttsPlayBtn').textContent = '▶';
+            
             // Update last read time
             this.storage.updateDocument(docId, { lastRead: new Date().toISOString() });
             
+            // Initialize TTS for this document
+            this.initializeTTS();
+            
             console.log('📖 Loaded document:', doc.name);
         }
-    }
+    }    
 
     // FORMAT CONTENT FOR DISPLAY
     formatContent(content) {
@@ -325,6 +353,156 @@ class DyslexiaAssistant {
         if ('serviceWorker' in navigator) {
             console.log('✅ Service Worker supported (PWA ready for Week 4)');
         }
+    }
+
+        // TEXT-TO-SPEECH METHODS
+
+    initializeTTS() {
+        if (!TextToSpeech.isSupported()) {
+            alert('❌ Text-to-Speech is not supported in your browser.\n\nTry Chrome, Firefox, Safari, or Edge.');
+            return;
+        }
+
+        // Populate voice dropdown
+        const voices = this.tts.getAvailableVoices();
+        const voiceSelect = document.getElementById('ttsVoice');
+        voiceSelect.innerHTML = voices.map((voice, index) => 
+            `<option value="${index}">${voice.name} ${voice.lang ? `(${voice.lang})` : ''}</option>`
+        ).join('');
+
+        // Initialize TTS callbacks
+        this.tts.init(
+            () => this.onTTSStart(),      // onStart
+            () => this.onTTSEnd(),        // onEnd
+            () => this.onTTSPause(),      // onPause
+            () => this.onTTSResume(),     // onResume
+            (error) => this.onTTSError(error), // onError
+            (word) => this.onTTSWordChange(word) // onWordChange
+        );
+
+        console.log('✅ TTS initialized successfully');
+    }
+
+    toggleTTS() {
+        if (!this.currentDoc) {
+            alert('📖 Please load a document first');
+            return;
+        }
+
+        const playBtn = document.getElementById('ttsPlayBtn');
+        const status = this.tts.getStatus();
+
+        if (!status.isPlaying && this.tts.utterances.length === 0) {
+            // First time - prepare text
+            console.log('📖 Preparing text for speech...');
+            this.tts.prepareText(this.currentDoc.content);
+            this.tts.play();
+            playBtn.textContent = '⏸';
+            this.showTTSStatus();
+        } else if (status.isPlaying && !status.isPaused) {
+            // Playing - pause
+            this.tts.pause();
+            playBtn.textContent = '▶';
+        } else if (status.isPaused) {
+            // Paused - resume
+            this.tts.resume();
+            playBtn.textContent = '⏸';
+        }
+    }
+
+    stopTTS() {
+        this.tts.stop();
+        document.getElementById('ttsPlayBtn').textContent = '▶';
+        document.getElementById('ttsStatus').style.display = 'none';
+        document.getElementById('ttsProgress').style.display = 'none';
+        this.clearCurrentWordHighlight();
+        console.log('⏹️ Speech stopped');
+    }
+
+    showTTSStatus() {
+        document.getElementById('ttsStatus').style.display = 'block';
+        document.getElementById('ttsProgress').style.display = 'block';
+    }
+
+    onTTSStart() {
+        console.log('🎵 Speech started');
+        this.showTTSStatus();
+    }
+
+    onTTSEnd() {
+        console.log('✅ Speech ended');
+        document.getElementById('ttsPlayBtn').textContent = '▶';
+        setTimeout(() => {
+            document.getElementById('ttsStatus').style.display = 'none';
+            document.getElementById('ttsProgress').style.display = 'none';
+        }, 500);
+        this.clearCurrentWordHighlight();
+    }
+
+    onTTSPause() {
+        console.log('⏸️ Speech paused');
+        document.getElementById('ttsPlayBtn').textContent = '▶';
+    }
+
+    onTTSResume() {
+        console.log('▶️ Speech resumed');
+        document.getElementById('ttsPlayBtn').textContent = '⏸';
+    }
+
+    onTTSError(error) {
+        console.error('❌ TTS Error:', error);
+        alert('❌ Speech error: ' + error);
+    }
+
+    onTTSWordChange(wordData) {
+        // Update current word display
+        document.getElementById('ttsCurrentWord').textContent = wordData.word || '...';
+
+        // Update progress
+        const status = this.tts.getStatus();
+        const progress = Math.max(0, status.progress);
+        document.getElementById('ttsProgressBar').style.width = progress + '%';
+
+        // Highlight current word in text
+        this.highlightCurrentWord(wordData.word);
+    }
+
+    highlightCurrentWord(word) {
+        const textDisplay = document.getElementById('textDisplay');
+        if (!textDisplay) return;
+
+        // Clear previous highlights
+        this.clearCurrentWordHighlight();
+
+        if (!word) return;
+
+        // Find and highlight the word
+        const content = textDisplay.innerHTML;
+        const regex = new RegExp(`\\b${this.escapeRegex(word)}\\b`, 'gi');
+        const highlighted = content.replace(regex, match => 
+            `<span style="background-color: #FFFF00; color: #000; padding: 2px 4px; border-radius: 2px; font-weight: 600;">${match}</span>`
+        );
+
+        textDisplay.innerHTML = highlighted;
+    }
+
+    clearCurrentWordHighlight() {
+        const textDisplay = document.getElementById('textDisplay');
+        if (!textDisplay) return;
+
+        const content = textDisplay.innerHTML;
+        const cleaned = content.replace(
+            /<span style="background-color: #FFFF00;[^"]*">[^<]*<\/span>/gi,
+            match => match.replace(/<[^>]+>/g, '')
+        );
+
+        if (cleaned !== content) {
+            textDisplay.innerHTML = cleaned;
+        }
+    }
+
+    escapeRegex(string) {
+        return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
     }
 }
 
