@@ -35,9 +35,10 @@
 
         <!-- NAVIGATION -->
         <nav class="nav-tabs">
-            <button class="nav-tab active" data-tab="home">Home</button>
-            <button class="nav-tab" data-tab="reader">Reader</button>
-            <button class="nav-tab" data-tab="settings">Settings</button>
+            <button class="nav-tab active" onclick="window.app.switchPage('home')">Home</button>
+            <button class="nav-tab" onclick="window.app.switchPage('reader')">Reader</button>
+            <button class="nav-tab" onclick="window.app.switchPage('statistics')">📊 Stats</button>
+            <button class="nav-tab" onclick="window.app.switchPage('settings')">Settings</button>
         </nav>
 
         <!-- MAIN CONTENT -->
@@ -91,7 +92,7 @@
                 <div class="reader-container">
                     <div class="reader-header">
                         <h2 id="docTitle">Document Title</h2>
-                        <button class="btn-close" data-tab="home">✕</button>
+                        <button class="btn-close" onclick="window.app.switchPage('home')" title="Close Reader">✕</button>
                     </div>
                     
                     <div class="reader-controls">
@@ -294,6 +295,93 @@
                 </div>
             </section>
 
+            <!-- STATISTICS PAGE -->
+            <section id="statistics" class="page">
+                <div class="container">
+                    <h2>📊 Reading Statistics</h2>
+
+                    <!-- Stats Grid -->
+                    <div style="
+                        display: grid;
+                        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+                        gap: var(--gap-lg);
+                        margin-bottom: var(--pad-xl);
+                    ">
+                        <div style="
+                            background: var(--accent-light);
+                            padding: var(--pad-lg);
+                            border-radius: var(--radius-lg);
+                            border-left: 4px solid var(--accent);
+                        ">
+                            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
+                                Total Sessions
+                            </div>
+                            <div style="font-size: 28px; font-weight: 700; color: var(--accent);">
+                                <span id="statSessions">0</span>
+                            </div>
+                        </div>
+
+                        <div style="
+                            background: var(--accent-light);
+                            padding: var(--pad-lg);
+                            border-radius: var(--radius-lg);
+                            border-left: 4px solid #10B981;
+                        ">
+                            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
+                                Words Read
+                            </div>
+                            <div style="font-size: 28px; font-weight: 700; color: #10B981;">
+                                <span id="statWords">0</span>
+                            </div>
+                        </div>
+
+                        <div style="
+                            background: var(--accent-light);
+                            padding: var(--pad-lg);
+                            border-radius: var(--radius-lg);
+                            border-left: 4px solid #F59E0B;
+                        ">
+                            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
+                                Time Spent Reading
+                            </div>
+                            <div style="font-size: 28px; font-weight: 700; color: #F59E0B;">
+                                <span id="statTime">0</span>
+                            </div>
+                        </div>
+
+                        <div style="
+                            background: var(--accent-light);
+                            padding: var(--pad-lg);
+                            border-radius: var(--radius-lg);
+                            border-left: 4px solid #EF4444;
+                        ">
+                            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
+                                Reading Streak 🔥
+                            </div>
+                            <div style="font-size: 28px; font-weight: 700; color: #EF4444;">
+                                <span id="statStreak">0</span> days
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Recent Activity -->
+                    <h3 style="margin-bottom: var(--gap-lg);">📖 Recent Reading Sessions</h3>
+                    <div id="recentSessions" style="
+                        background: var(--bg-secondary);
+                        border-radius: var(--radius-lg);
+                        padding: var(--pad-lg);
+                    "></div>
+
+                    <!-- Clear Stats Button -->
+                    <button class="btn-primary" onclick="if(confirm('Are you sure? This cannot be undone.')) { window.app.stats.clearAll(); window.app.updateStatistics(); alert('✅ Statistics cleared'); }" style="
+                        background: var(--danger);
+                        margin-top: var(--pad-xl);
+                    ">
+                        🗑️ Clear All Statistics
+                    </button>
+                </div>
+            </section>
+
             <!-- SETTINGS PAGE -->
             <section id="settings" class="page">
                 <div class="container">
@@ -388,13 +476,25 @@
     <!-- Toast Notification Container -->
     <div id="toastContainer" class="toast-container"></div>
 
-    <!-- Scripts -->
+    <!-- Scripts and Libraries -->
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
     <script src="js/utils.js"></script>
     <script src="js/file-handler.js"></script>
     <script src="js/storage.js"></script>
     <script src="js/highlights.js"></script>
     <script src="js/notes.js"></script>
+    <script src="js/state.js"></script>
     <script src="js/tts.js"></script>
     <script src="js/app.js"></script>
+
+    <!-- Service Worker for offline support -->
+    <script>
+        if ('serviceWorker' in navigator) {
+            navigator.serviceWorker.register('js/service-worker.js')
+                .then(registration => console.log('✅ Service Worker registered'))
+                .catch(error => console.log('⚠️ Service Worker registration failed:', error));
+        }
+    </script>
 </body>
 </html>

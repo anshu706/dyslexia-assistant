@@ -12,6 +12,8 @@ class DyslexiaAssistant {
         this.bookmarks = [];
         this.sidebarOpen = false;
         this.currentSidebarPanel = 'highlights';
+        this.stats = new ReadingStats();
+        this.readingStartTime = null;
         this.init();
     }
 
@@ -33,6 +35,7 @@ class DyslexiaAssistant {
         this.applySettings();
         this.displayDocuments();
         this.loadBookmarks();
+        this.updateStatistics();
         this.initializeTTS();
         this.registerServiceWorker();
     }
@@ -41,7 +44,7 @@ class DyslexiaAssistant {
         // Navigation tabs
         document.querySelectorAll('.nav-tab').forEach((tab, index) => {
             tab.addEventListener('click', () => {
-                const pages = ['home', 'reader', 'settings'];
+                const pages = ['home', 'reader', 'statistics', 'settings'];
                 this.switchPage(pages[index]);
             });
         });
@@ -127,7 +130,7 @@ class DyslexiaAssistant {
 
         // Update nav tabs
         document.querySelectorAll('.nav-tab').forEach(tab => tab.classList.remove('active'));
-        const pageIndex = { 'home': 0, 'reader': 1, 'settings': 2 };
+        const pageIndex = { 'home': 0, 'reader': 1, 'statistics': 2, 'settings': 3 };
         if (pageIndex[pageName] !== undefined) {
             document.querySelectorAll('.nav-tab')[pageIndex[pageName]].classList.add('active');
         }
@@ -441,6 +444,7 @@ class DyslexiaAssistant {
         document.getElementById('ttsStatus').style.display = 'none';
         document.getElementById('ttsProgress').style.display = 'none';
         this.clearCurrentWordHighlight();
+        this.endReadingSession();
         console.log('⏹️ Speech stopped');
     }
 
@@ -452,6 +456,7 @@ class DyslexiaAssistant {
     onTTSStart() {
         console.log('🎵 Speech started');
         this.showTTSStatus();
+        this.startReadingSession();
     }
 
     onTTSEnd() {
@@ -462,6 +467,7 @@ class DyslexiaAssistant {
             document.getElementById('ttsProgress').style.display = 'none';
         }, 500);
         this.clearCurrentWordHighlight();
+        this.endReadingSession();
     }
 
     onTTSPause() {
@@ -501,29 +507,31 @@ class DyslexiaAssistant {
 
         if (!word) return;
 
-        // Find and highlight the word
-        const content = textDisplay.innerHTML;
-        const regex = new RegExp(`\\b${this.escapeRegex(word)}\\b`, 'gi');
-        const highlighted = content.replace(regex, match => 
-            `<span style="background-color: #FFFF00; color: #000; padding: 2px 4px; border-radius: 2px; font-weight: 600;">${match}</span>`
-        );
-
-        textDisplay.innerHTML = highlighted;
+        // Find and highlight word safely in paragraph content
+        const paragraphs = textDisplay.querySelectorAll('p');
+        paragraphs.forEach(p => {
+            const regex = new RegExp(`\\b(${this.escapeRegex(word)})\\b`, 'i');
+            if (regex.test(p.innerHTML)) {
+                p.innerHTML = p.innerHTML.replace(
+                    regex,
+                    '<span class="tts-current-word" style="background-color: #FFFF00; color: #000; padding: 2px 4px; border-radius: 2px; font-weight: 600;">$1</span>'
+                );
+            }
+        });
     }
 
     clearCurrentWordHighlight() {
         const textDisplay = document.getElementById('textDisplay');
         if (!textDisplay) return;
 
-        const content = textDisplay.innerHTML;
-        const cleaned = content.replace(
-            /<span style="background-color: #FFFF00;[^"]*">[^<]*<\/span>/gi,
-            match => match.replace(/<[^>]+>/g, '')
-        );
-
-        if (cleaned !== content) {
-            textDisplay.innerHTML = cleaned;
-        }
+        const highlightedElements = textDisplay.querySelectorAll('.tts-current-word');
+        highlightedElements.forEach(el => {
+            const parent = el.parentNode;
+            if (parent) {
+                parent.replaceChild(document.createTextNode(el.textContent), el);
+                parent.normalize();
+            }
+        });
     }
 
     escapeRegex(string) {
@@ -708,14 +716,22 @@ class DyslexiaAssistant {
 
     applyHighlightsToText() {
         const textDisplay = document.getElementById('textDisplay');
-        let html = textDisplay.innerHTML;
+        if (!textDisplay || !this.highlightManager) return;
 
-        this.highlightManager.getAll().forEach(hl => {
-            const regex = new RegExp(`(${this.escapeRegex(hl.text)})`, 'gi');
-            html = html.replace(regex, `<mark style="background-color: ${hl.color}; padding: 2px 4px; border-radius: 2px;">$1</mark>`);
+        // Reset to clean formatted content first
+        if (this.currentDoc) {
+            textDisplay.innerHTML = this.formatContent(this.currentDoc.content);
+        }
+
+        const highlights = this.highlightManager.getAll();
+        highlights.forEach(hl => {
+            if (!hl.text) return;
+            const paragraphs = textDisplay.querySelectorAll('p');
+            paragraphs.forEach(p => {
+                const regex = new RegExp(`(${this.escapeRegex(hl.text)})`, 'gi');
+                p.innerHTML = p.innerHTML.replace(regex, `<mark style="background-color: ${hl.color}; padding: 2px 4px; border-radius: 2px;">$1</mark>`);
+            });
         });
-
-        textDisplay.innerHTML = html;
     }
 
     // NOTES SYSTEM
@@ -913,7 +929,11 @@ class DyslexiaAssistant {
     showSidebarPanel(panel) {
         // Hide all panels
         document.querySelectorAll('.sidebar-panel').forEach(p => p.style.display = 'none');
-        document.querySelectorAll('.sidebar-tab').forEach(t => t.style.borderBottomColor = 'transparent');
+        document.querySelectorAll('.sidebar-tab').forEach(t => {
+            t.classList.remove('active');
+            t.style.borderBottomColor = 'transparent';
+            t.style.color = 'var(--text-secondary)';
+        });
 
         // Show selected panel
         const panelElement = document.getElementById(panel + 'Panel');
@@ -921,11 +941,87 @@ class DyslexiaAssistant {
             panelElement.style.display = 'block';
         }
 
-        // Update tab styling
-        event.target.style.borderBottomColor = 'var(--accent)';
-        event.target.style.color = 'var(--accent)';
+        // Update tab styling for selected panel
+        const tabBtn = document.querySelector(`.sidebar-tab[onclick*="${panel}"]`);
+        if (tabBtn) {
+            tabBtn.classList.add('active');
+            tabBtn.style.borderBottomColor = 'var(--accent)';
+            tabBtn.style.color = 'var(--accent)';
+        }
 
         this.currentSidebarPanel = panel;
+    }
+
+    // READING STATISTICS
+
+    startReadingSession() {
+        this.readingStartTime = Date.now();
+        console.log('📖 Reading session started');
+    }
+
+    endReadingSession() {
+        if (!this.readingStartTime || !this.currentDoc) return;
+
+        const timeSpentSeconds = Math.round((Date.now() - this.readingStartTime) / 1000);
+        const wordsRead = this.currentDoc.content.split(/\s+/).length;
+
+        this.stats.recordSession(
+            this.currentDoc.id,
+            this.currentDoc.name,
+            wordsRead,
+            timeSpentSeconds,
+            this.currentDoc.content
+        );
+
+        this.readingStartTime = null;
+        this.updateStatistics();
+        console.log(`📊 Session ended: ${wordsRead} words in ${this.stats.formatTime(timeSpentSeconds)}`);
+    }
+
+    updateStatistics() {
+        const totalStats = this.stats.getTotalStats();
+
+        // Update stats dashboard
+        document.getElementById('statSessions').textContent = totalStats.totalSessions;
+        document.getElementById('statWords').textContent = this.stats.formatWords(totalStats.totalWordsRead);
+        document.getElementById('statTime').textContent = this.stats.formatTime(totalStats.totalTimeSpent);
+        document.getElementById('statStreak').textContent = totalStats.readingStreak;
+
+        // Display recent sessions
+        this.displayRecentSessions();
+    }
+
+    displayRecentSessions() {
+        const recentSessions = this.stats.getRecentSessions(10);
+        const container = document.getElementById('recentSessions');
+
+        if (recentSessions.length === 0) {
+            container.innerHTML = '<p style="color: var(--text-muted); text-align: center;">No reading sessions yet. Start reading to see your stats!</p>';
+            return;
+        }
+
+        container.innerHTML = `
+            <table style="width: 100%; border-collapse: collapse;">
+                <thead>
+                    <tr style="border-bottom: 1px solid var(--border);">
+                        <th style="text-align: left; padding: 12px; color: var(--text-secondary); font-weight: 600;">📖 Document</th>
+                        <th style="text-align: left; padding: 12px; color: var(--text-secondary); font-weight: 600;">📊 Words</th>
+                        <th style="text-align: left; padding: 12px; color: var(--text-secondary); font-weight: 600;">⏱️ Time</th>
+                        <th style="text-align: left; padding: 12px; color: var(--text-secondary); font-weight: 600;">📅 Date</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    ${recentSessions.map(session => `
+                        <tr style="border-bottom: 1px solid var(--border); hover: { background: var(--bg-primary); }">
+                            <td style="padding: 12px; color: var(--text-primary);">${this.escapeHtml(session.docName.substring(0, 30))}</td>
+                            <td style="padding: 12px; color: var(--text-secondary);">${session.wordsRead || 0}</td>
+                            <td style="padding: 12px; color: var(--text-secondary);">${this.stats.formatTime(session.timeSpent)}</td>
+                            <td style="padding: 12px; color: var(--text-muted);">${new Date(session.timestamp).toLocaleDateString()}</td>
+                        </tr>
+                    `).join('')}
+                </tbody>
+            </table>
+        `;
     }
 
 }

@@ -33,7 +33,7 @@
 }
 
 /* Manual dark mode class */
-body[data-theme="dark"] {
+[data-theme="dark"] {
     --bg-primary: #1F2937;
     --bg-secondary: #111827;
     --text-primary: #F9FAFB;
@@ -45,7 +45,7 @@ body[data-theme="dark"] {
 }
 
 /* Manual light mode class */
-body[data-theme="light"] {
+[data-theme="light"] {
     --bg-primary: #FFFFFF;
     --bg-secondary: #F3F4F6;
     --text-primary: #1F2937;

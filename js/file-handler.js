@@ -76,26 +76,34 @@ class FileHandler {
         });
     }
 
-    // Read DOCX file (simplified - extracts text from XML)
+    // Read DOCX file (extracts text from XML using JSZip)
     async readDocxFile(file) {
         return new Promise((resolve, reject) => {
             const reader = new FileReader();
             reader.onload = async (e) => {
                 try {
                     const arrayBuffer = e.target.result;
+                    if (window.JSZip) {
+                        const zip = await JSZip.loadAsync(arrayBuffer);
+                        const docXml = await zip.file("word/document.xml")?.async("string");
+                        if (docXml) {
+                            const text = this.extractTextFromDocxXml(docXml);
+                            resolve(text || 'Unable to extract text from DOCX file');
+                            return;
+                        }
+                    }
+                    // Fallback using unzipDocx if JSZip isn't available
                     const zip = await this.unzipDocx(arrayBuffer);
                     const xmlText = zip.get('word/document.xml');
-                    
-                    if (!xmlText) {
-                        resolve('Unable to extract text from DOCX file');
+                    if (xmlText) {
+                        const text = this.extractTextFromDocxXml(xmlText);
+                        resolve(text || 'Unable to extract text from DOCX file');
                         return;
                     }
-
-                    const text = this.extractTextFromDocxXml(xmlText);
-                    resolve(text || 'Unable to extract text from DOCX file');
+                    resolve('Unable to extract text from DOCX file');
                 } catch (error) {
-                    console.warn('⚠️ DOCX parsing requires JSZip. Using fallback:', error.message);
-                    resolve('Note: Full DOCX support coming with JSZip library. For now, please use TXT or PDF files.');
+                    console.warn('⚠️ DOCX parsing error:', error.message);
+                    resolve('Unable to read DOCX file: ' + error.message);
                 }
             };
             reader.onerror = () => reject(new Error('Failed to read file'));
@@ -120,15 +128,34 @@ class FileHandler {
         }
     }
 
-    // Read PDF file (placeholder - full support in Day 3)
+    // Read PDF file (extracts text using PDF.js)
     async readPdfFile(file) {
-        return new Promise((resolve) => {
+        return new Promise((resolve, reject) => {
             const reader = new FileReader();
-            reader.onload = () => {
-                console.log('⚠️ PDF support coming in Day 3 with PDF.js library');
-                resolve('PDF file uploaded successfully! Full text extraction coming soon.');
+            reader.onload = async (e) => {
+                try {
+                    if (window.pdfjsLib) {
+                        pdfjsLib.GlobalWorkerOptions.workerSrc = 'https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js';
+                        const typedarray = new Uint8Array(e.target.result);
+                        const pdf = await pdfjsLib.getDocument(typedarray).promise;
+                        let fullText = '';
+                        for (let i = 1; i <= pdf.numPages; i++) {
+                            const page = await pdf.getPage(i);
+                            const textContent = await page.getTextContent();
+                            const pageText = textContent.items.map(item => item.str).join(' ');
+                            fullText += pageText + '\n\n';
+                        }
+                        resolve(fullText.trim() || 'PDF file loaded, but no text content could be extracted.');
+                        return;
+                    }
+                    resolve('PDF file uploaded successfully!');
+                } catch (error) {
+                    console.error('❌ PDF extraction error:', error);
+                    resolve('Error parsing PDF file: ' + error.message);
+                }
             };
-            reader.readAsText(file);
+            reader.onerror = () => reject(new Error('Failed to read PDF file'));
+            reader.readAsArrayBuffer(file);
         });
     }
 
