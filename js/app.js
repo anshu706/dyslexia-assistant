@@ -6,12 +6,24 @@ class DyslexiaAssistant {
         this.fileHandler = new FileHandler();
         this.storage = new StorageManager();
         this.settings = this.storage.getSettings();
-        this.tts = this.TextToSpeech();
+        this.tts = new TextToSpeech();
         this.init();
     }
 
     init() {
         console.log('🚀 Dyslexia Assistant initializing...');
+        
+        // Override global window.alert with custom toasts
+        window.alert = (message) => {
+            let type = 'info';
+            if (message.includes('✅') || message.includes('success')) type = 'success';
+            else if (message.includes('❌') || message.includes('error') || message.includes('Error')) type = 'error';
+            else if (message.includes('⚠️') || message.includes('warn') || message.includes('Warning')) type = 'warning';
+            
+            const cleanMsg = message.replace(/^[✅❌⚠️ℹ️📖🗑️✏️💾📤🎵📚🎨]\s*/, '');
+            this.showToast(cleanMsg, type);
+        };
+
         this.setupEventListeners();
         this.applySettings();
         this.displayDocuments();
@@ -26,22 +38,23 @@ class DyslexiaAssistant {
                 const pages = ['home', 'reader', 'settings'];
                 this.switchPage(pages[index]);
             });
-            // TTS Controls
-            document.getElementById('ttsPlayBtn').addEventListener('click', () => this.toggleTTS());
-            document.getElementById('ttsStopBtn').addEventListener('click', () => this.stopTTS());
-            document.getElementById('ttsSpeed').addEventListener('input', (e) => {
-                const value = parseFloat(e.target.value);
-                this.tts.setRate(value);
-                document.getElementById('ttsSpeedDisplay').textContent = value.toFixed(1) + 'x';
-            });
-            document.getElementById('ttsPitch').addEventListener('input', (e) => {
-                const value = parseFloat(e.target.value);
-                this.tts.setPitch(value);
-                document.getElementById('ttsPitchDisplay').textContent = value.toFixed(1);
-            });
-            document.getElementById('ttsVoice').addEventListener('change', (e) => {
-                this.tts.setVoice(parseInt(e.target.value));
-            });            
+        });
+
+        // TTS Controls
+        document.getElementById('ttsPlayBtn').addEventListener('click', () => this.toggleTTS());
+        document.getElementById('ttsStopBtn').addEventListener('click', () => this.stopTTS());
+        document.getElementById('ttsSpeed').addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            this.tts.setRate(value);
+            document.getElementById('ttsSpeedDisplay').textContent = value.toFixed(1) + 'x';
+        });
+        document.getElementById('ttsPitch').addEventListener('input', (e) => {
+            const value = parseFloat(e.target.value);
+            this.tts.setPitch(value);
+            document.getElementById('ttsPitchDisplay').textContent = value.toFixed(1);
+        });
+        document.getElementById('ttsVoice').addEventListener('change', (e) => {
+            this.tts.setVoice(parseInt(e.target.value));
         });
 
         // Theme toggle
@@ -93,6 +106,12 @@ class DyslexiaAssistant {
         document.getElementById('theme').addEventListener('change', (e) => this.updateTheme(e.target.value));
         document.getElementById('contrast').addEventListener('change', (e) => this.updateContrast(e.target.checked));
         document.getElementById('saveSettingsBtn').addEventListener('click', () => this.saveSettings());
+
+        // Custom Modal Event Listeners
+        document.getElementById('closePasteModal').addEventListener('click', () => this.hidePasteModal());
+        document.getElementById('cancelPasteBtn').addEventListener('click', () => this.hidePasteModal());
+        document.getElementById('submitPasteBtn').addEventListener('click', () => this.submitPasteText());
+        document.getElementById('cancelDeleteBtn').addEventListener('click', () => this.hideConfirmModal());
     }
 
     // NAVIGATION
@@ -150,16 +169,8 @@ class DyslexiaAssistant {
     }
 
     // TEXT INPUT
-    async handleTextInput() {
-        const textInput = prompt('📝 Enter or paste your text here:');
-        if (!textInput) return;
-
-        const doc = await this.fileHandler.handleTextInput(textInput);
-        if (doc) {
-            this.storage.saveDocument(doc);
-            this.loadDocument(doc.id);
-            this.switchPage('reader');
-        }
+    handleTextInput() {
+        this.showPasteModal();
     }
 
     // LOAD DOCUMENT
@@ -263,11 +274,11 @@ class DyslexiaAssistant {
 
     // DELETE DOCUMENT
     deleteDocument(docId) {
-        if (confirm('🗑️ Delete this document? This cannot be undone.')) {
+        this.showConfirmModal('Are you sure you want to delete this document? This action cannot be undone.', () => {
             this.storage.deleteDocument(docId);
             this.displayDocuments();
             console.log('✅ Document deleted');
-        }
+        });
     }
 
     // THEME
@@ -503,6 +514,78 @@ class DyslexiaAssistant {
 
     escapeRegex(string) {
         return string.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+    }
+
+    // TOAST NOTIFICATIONS
+    showToast(message, type = 'info') {
+        const container = document.getElementById('toastContainer');
+        if (!container) return;
+
+        const toast = document.createElement('div');
+        toast.className = `toast toast-${type}`;
+        
+        const emoji = type === 'success' ? '✅' : type === 'error' ? '❌' : type === 'warning' ? '⚠️' : 'ℹ️';
+        toast.innerHTML = `<span>${emoji}</span> <span>${this.escapeHtml(message)}</span>`;
+        
+        container.appendChild(toast);
+        
+        setTimeout(() => {
+            toast.style.animation = 'toastFadeOut 0.3s ease forwards';
+            setTimeout(() => toast.remove(), 300);
+        }, 4000);
+    }
+
+    // PASTE TEXT MODAL METHODS
+    showPasteModal() {
+        const modal = document.getElementById('pasteModal');
+        const textarea = document.getElementById('pasteTextarea');
+        textarea.value = '';
+        modal.style.display = 'flex';
+        textarea.focus();
+    }
+
+    hidePasteModal() {
+        document.getElementById('pasteModal').style.display = 'none';
+    }
+
+    async submitPasteText() {
+        const textarea = document.getElementById('pasteTextarea');
+        const textInput = textarea.value;
+        
+        if (!textInput || textInput.trim().length === 0) {
+            this.showToast('Please enter some text', 'warning');
+            return;
+        }
+
+        const doc = await this.fileHandler.handleTextInput(textInput);
+        if (doc) {
+            this.storage.saveDocument(doc);
+            this.loadDocument(doc.id);
+            this.hidePasteModal();
+            this.switchPage('reader');
+            this.showToast('Document created successfully', 'success');
+        }
+    }
+
+    // CONFIRM MODAL METHODS
+    showConfirmModal(message, onConfirm) {
+        const modal = document.getElementById('confirmModal');
+        modal.querySelector('.modal-body p').textContent = message;
+        
+        const confirmBtn = document.getElementById('confirmDeleteBtn');
+        const newConfirmBtn = confirmBtn.cloneNode(true);
+        confirmBtn.parentNode.replaceChild(newConfirmBtn, confirmBtn);
+        
+        newConfirmBtn.addEventListener('click', () => {
+            onConfirm();
+            this.hideConfirmModal();
+        });
+        
+        modal.style.display = 'flex';
+    }
+
+    hideConfirmModal() {
+        document.getElementById('confirmModal').style.display = 'none';
     }
 }
 
