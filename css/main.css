@@ -636,3 +636,46 @@ h3 {
 @keyframes toastFadeOut {
     to { opacity: 0; transform: translateY(-10px); visibility: hidden; }
 }
+
+/* SIDEBAR STYLING */
+
+.sidebar-panel {
+    animation: slideIn 0.3s ease;
+}
+
+@keyframes slideIn {
+    from {
+        opacity: 0;
+        transform: translateX(20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateX(0);
+    }
+}
+
+.sidebar-tab {
+    transition: all 0.3s ease;
+}
+
+.sidebar-tab:hover {
+    color: var(--accent);
+}
+
+.sidebar-tab:active {
+    border-bottom-color: var(--accent);
+    color: var(--accent);
+}
+
+/* Responsive sidebar */
+@media (max-width: 1024px) {
+    #sidebarContainer {
+        width: 0 !important;
+    }
+}
+
+/* Highlight marks */
+mark {
+    padding: 2px 4px;
+    border-radius: 2px;
+}

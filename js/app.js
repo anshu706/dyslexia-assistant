@@ -7,11 +7,16 @@ class DyslexiaAssistant {
         this.storage = new StorageManager();
         this.settings = this.storage.getSettings();
         this.tts = new TextToSpeech();
+        this.highlightManager = null;
+        this.notesManager = null;
+        this.bookmarks = [];
+        this.sidebarOpen = false;
+        this.currentSidebarPanel = 'highlights';
         this.init();
     }
 
     init() {
-        console.log('🚀 Dyslexia Assistant initializing...');
+        console.log('🚀 Dyslexia Assistant initializing......');
         
         // Override global window.alert with custom toasts
         window.alert = (message) => {
@@ -27,6 +32,7 @@ class DyslexiaAssistant {
         this.setupEventListeners();
         this.applySettings();
         this.displayDocuments();
+        this.loadBookmarks();
         this.initializeTTS();
         this.registerServiceWorker();
     }
@@ -184,15 +190,23 @@ class DyslexiaAssistant {
             // Stop any ongoing speech
             this.stopTTS();
             
-            // Reset TTS utterances so new text can be prepared
+            // Reset TTS utterances
             this.tts.utterances = [];
             document.getElementById('ttsPlayBtn').textContent = '▶';
+            
+            // Load highlights and notes
+            this.setupHighlighting();
+            this.setupNotes();
+            this.displayBookmarks();
             
             // Update last read time
             this.storage.updateDocument(docId, { lastRead: new Date().toISOString() });
             
-            // Initialize TTS for this document
+            // Initialize TTS
             this.initializeTTS();
+            
+            // Close sidebar
+            this.closeSidebar();
             
             console.log('📖 Loaded document:', doc.name);
         }
@@ -587,6 +601,333 @@ class DyslexiaAssistant {
     hideConfirmModal() {
         document.getElementById('confirmModal').style.display = 'none';
     }
+
+    // HIGHLIGHTING SYSTEM
+
+    setupHighlighting() {
+        if (!this.currentDoc) return;
+
+        // Initialize highlight manager
+        this.highlightManager = new HighlightManager(this.currentDoc.id);
+
+        // Setup color picker
+        const colorPicker = document.getElementById('colorPicker');
+        if (colorPicker) {
+            colorPicker.innerHTML = this.highlightManager.colors.map(color =>
+                `<button onclick="window.app.highlightManager.setColor('${color.hex}'); window.app.updateColorPicker();" style="
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    background: ${color.hex};
+                    border: 2px solid ${this.highlightManager.currentColor === color.hex ? 'var(--text-primary)' : 'transparent'};
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                " title="${color.name}"></button>`
+            ).join('');
+        }
+
+        // Display highlights
+        this.displayHighlights();
+
+        // Setup text selection for highlighting
+        document.getElementById('textDisplay').addEventListener('mouseup', () => this.handleTextSelection());
+    }
+
+    updateColorPicker() {
+        const colorPicker = document.getElementById('colorPicker');
+        if (colorPicker) {
+            colorPicker.innerHTML = this.highlightManager.colors.map(color =>
+                `<button onclick="window.app.highlightManager.setColor('${color.hex}'); window.app.updateColorPicker();" style="
+                    width: 32px;
+                    height: 32px;
+                    border-radius: 50%;
+                    background: ${color.hex};
+                    border: 2px solid ${this.highlightManager.currentColor === color.hex ? 'var(--text-primary)' : 'transparent'};
+                    cursor: pointer;
+                    transition: all 0.2s ease;
+                " title="${color.name}"></button>`
+            ).join('');
+        }
+    }
+
+    handleTextSelection() {
+        const selected = window.getSelection().toString().trim();
+        if (selected.length > 0) {
+            if (confirm(`Highlight this text?\n\n"${selected.substring(0, 50)}..."`)) {
+                this.highlightManager.addHighlight(selected, this.highlightManager.currentColor);
+                this.displayHighlights();
+                this.applyHighlightsToText();
+                console.log('✅ Text highlighted');
+            }
+            window.getSelection().removeAllRanges();
+        }
+    }
+
+    displayHighlights() {
+        const highlights = this.highlightManager.getAll();
+        const list = document.getElementById('highlightsList');
+
+        if (highlights.length === 0) {
+            list.innerHTML = '<p style="color: var(--text-muted); font-size: 14px;">📂 No highlights yet. Select text to highlight.</p>';
+            return;
+        }
+
+        list.innerHTML = highlights.map(hl => `
+            <div style="
+                background: var(--bg-primary);
+                padding: var(--pad-md);
+                border-left: 4px solid ${hl.color};
+                border-radius: 4px;
+                display: flex;
+                justify-content: space-between;
+                align-items: start;
+                gap: var(--gap-md);
+            ">
+                <div style="flex: 1;">
+                    <div style="
+                        color: var(--text-primary);
+                        font-size: 14px;
+                        font-weight: 500;
+                        margin-bottom: 4px;
+                        word-break: break-word;
+                    ">"${hl.text.substring(0, 80)}${hl.text.length > 80 ? '...' : ''}"</div>
+                    <div style="font-size: 12px; color: var(--text-muted);">
+                        ${new Date(hl.timestamp).toLocaleDateString()}
+                    </div>
+                </div>
+                <button onclick="window.app.highlightManager.deleteHighlight('${hl.id}'); window.app.displayHighlights();" style="
+                    background: transparent;
+                    border: none;
+                    color: var(--danger);
+                    cursor: pointer;
+                    font-size: 16px;
+                ">🗑️</button>
+            </div>
+        `).join('');
+    }
+
+    applyHighlightsToText() {
+        const textDisplay = document.getElementById('textDisplay');
+        let html = textDisplay.innerHTML;
+
+        this.highlightManager.getAll().forEach(hl => {
+            const regex = new RegExp(`(${this.escapeRegex(hl.text)})`, 'gi');
+            html = html.replace(regex, `<mark style="background-color: ${hl.color}; padding: 2px 4px; border-radius: 2px;">$1</mark>`);
+        });
+
+        textDisplay.innerHTML = html;
+    }
+
+    // NOTES SYSTEM
+
+    setupNotes() {
+        if (!this.currentDoc) return;
+
+        this.notesManager = new NotesManager(this.currentDoc.id);
+        this.displayNotes();
+    }
+
+    openNoteModal() {
+        const title = prompt('📝 Note Title:');
+        if (!title) return;
+
+        const content = prompt('📝 Note Content:');
+        if (content === null) return;
+
+        const note = this.notesManager.addNote(title, content);
+        if (note) {
+            this.displayNotes();
+            alert('✅ Note saved!');
+        }
+    }
+
+    displayNotes() {
+        const notes = this.notesManager.getAll();
+        const list = document.getElementById('notesList');
+
+        if (notes.length === 0) {
+            list.innerHTML = '<p style="color: var(--text-muted); font-size: 14px;">📂 No notes yet. Click "Add Note" to create one.</p>';
+            return;
+        }
+
+        list.innerHTML = notes.map(note => `
+            <div style="
+                background: var(--bg-primary);
+                padding: var(--pad-md);
+                border-radius: 4px;
+                border: 1px solid var(--border);
+            ">
+                <div style="
+                    font-weight: 600;
+                    color: var(--text-primary);
+                    margin-bottom: 8px;
+                ">
+                    ${this.escapeHtml(note.title)}
+                </div>
+                <div style="
+                    font-size: 13px;
+                    color: var(--text-secondary);
+                    margin-bottom: 8px;
+                    line-height: 1.5;
+                    word-break: break-word;
+                ">
+                    ${this.escapeHtml(note.content)}
+                </div>
+                <div style="
+                    display: flex;
+                    gap: 8px;
+                    font-size: 12px;
+                    color: var(--text-muted);
+                ">
+                    <span>📅 ${new Date(note.lastModified).toLocaleDateString()}</span>
+                    <button onclick="window.app.editNote('${note.id}')" style="background: none; border: none; cursor: pointer; color: var(--accent);">✏️ Edit</button>
+                    <button onclick="window.app.notesManager.deleteNote('${note.id}'); window.app.displayNotes();" style="background: none; border: none; cursor: pointer; color: var(--danger);">🗑️ Delete</button>
+                </div>
+            </div>
+        `).join('');
+    }
+
+    editNote(noteId) {
+        const note = this.notesManager.getNote(noteId);
+        if (!note) return;
+
+        const newTitle = prompt('Edit Title:', note.title);
+        if (!newTitle) return;
+
+        const newContent = prompt('Edit Content:', note.content);
+        if (newContent === null) return;
+
+        this.notesManager.updateNote(noteId, newTitle, newContent);
+        this.displayNotes();
+        alert('✅ Note updated!');
+    }
+
+    // BOOKMARKS SYSTEM
+
+    addBookmark() {
+        if (!this.currentDoc) return;
+
+        const bookmarkName = prompt('⭐ Bookmark name:');
+        if (!bookmarkName) return;
+
+        const bookmark = {
+            id: 'bm-' + Date.now(),
+            docId: this.currentDoc.id,
+            docName: this.currentDoc.name,
+            name: bookmarkName,
+            timestamp: new Date().toISOString()
+        };
+
+        this.bookmarks.push(bookmark);
+        this.saveBookmarks();
+        this.displayBookmarks();
+        alert('✅ Bookmark added!');
+    }
+
+    displayBookmarks() {
+        const docBookmarks = this.bookmarks.filter(bm => bm.docId === this.currentDoc.id);
+        const list = document.getElementById('bookmarksList');
+
+        if (docBookmarks.length === 0) {
+            list.innerHTML = '<p style="color: var(--text-muted); font-size: 14px;">📂 No bookmarks yet. Click "Bookmark Current" to create one.</p>';
+            return;
+        }
+
+        list.innerHTML = docBookmarks.map(bm => `
+            <div style="
+                background: var(--bg-primary);
+                padding: var(--pad-md);
+                border-radius: 4px;
+                border-left: 4px solid var(--accent);
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                gap: var(--gap-md);
+            ">
+                <div>
+                    <div style="font-weight: 600; color: var(--text-primary); font-size: 14px;">
+                        ${this.escapeHtml(bm.name)}
+                    </div>
+                    <div style="font-size: 12px; color: var(--text-muted);">
+                        ${new Date(bm.timestamp).toLocaleDateString()}
+                    </div>
+                </div>
+                <button onclick="window.app.deleteBookmark('${bm.id}')" style="
+                    background: transparent;
+                    border: none;
+                    color: var(--danger);
+                    cursor: pointer;
+                    font-size: 16px;
+                ">🗑️</button>
+            </div>
+        `).join('');
+    }
+
+    deleteBookmark(bookmarkId) {
+        this.bookmarks = this.bookmarks.filter(bm => bm.id !== bookmarkId);
+        this.saveBookmarks();
+        this.displayBookmarks();
+    }
+
+    saveBookmarks() {
+        localStorage.setItem('dyslexia_bookmarks', JSON.stringify(this.bookmarks));
+    }
+
+    loadBookmarks() {
+        try {
+            const data = localStorage.getItem('dyslexia_bookmarks');
+            this.bookmarks = data ? JSON.parse(data) : [];
+        } catch (error) {
+            console.error('Error loading bookmarks:', error);
+            this.bookmarks = [];
+        }
+    }
+
+    // SIDEBAR MANAGEMENT
+
+    toggleSidebar(panel) {
+        if (this.sidebarOpen && this.currentSidebarPanel === panel) {
+            this.closeSidebar();
+        } else {
+            this.openSidebar(panel);
+        }
+    }
+
+    openSidebar(panel = 'highlights') {
+        const sidebar = document.getElementById('sidebarContainer');
+        if (sidebar) {
+            sidebar.style.width = '350px';
+            this.sidebarOpen = true;
+            this.showSidebarPanel(panel);
+        }
+    }
+
+    closeSidebar() {
+        const sidebar = document.getElementById('sidebarContainer');
+        if (sidebar) {
+            sidebar.style.width = '0';
+            this.sidebarOpen = false;
+        }
+    }
+
+    showSidebarPanel(panel) {
+        // Hide all panels
+        document.querySelectorAll('.sidebar-panel').forEach(p => p.style.display = 'none');
+        document.querySelectorAll('.sidebar-tab').forEach(t => t.style.borderBottomColor = 'transparent');
+
+        // Show selected panel
+        const panelElement = document.getElementById(panel + 'Panel');
+        if (panelElement) {
+            panelElement.style.display = 'block';
+        }
+
+        // Update tab styling
+        event.target.style.borderBottomColor = 'var(--accent)';
+        event.target.style.color = 'var(--accent)';
+
+        this.currentSidebarPanel = panel;
+    }
+
 }
 
 // Initialize app when DOM is ready

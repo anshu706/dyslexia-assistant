@@ -127,11 +127,10 @@
 
                         <!-- Other Tools -->
                         <div style="display: flex; align-items: center; gap: var(--gap-md);">
-                            <button class="btn-icon" id="highlightBtn" title="Highlight">🖍</button>
-                            <button class="btn-icon" id="noteBtn" title="Add Note">📝</button>
-                            <button class="btn-icon" id="bookmarkBtn" title="Bookmark">⭐</button>
+                            <button class="btn-icon" id="highlightBtn" onclick="window.app.toggleSidebar('highlights')" title="Highlight">🖍</button>
+                            <button class="btn-icon" id="noteBtn" onclick="window.app.openNoteModal()" title="Add Note">📝</button>
+                            <button class="btn-icon" id="bookmarkBtn" onclick="window.app.addBookmark()" title="Bookmark">⭐</button>
                         </div>
-                    </div>
 
                     <!-- TTS Progress Bar -->
                     <div id="ttsProgress" style="
@@ -165,6 +164,133 @@
                     <div class="text-display" id="textDisplay">
                         <p>Your document will appear here</p>
                     </div>
+                </div>
+
+                <!-- SIDEBAR PANELS -->
+                <div id="sidebarContainer" style="
+                    position: fixed;
+                    right: 0;
+                    top: var(--header-height);
+                    width: 0;
+                    height: calc(100vh - var(--header-height));
+                    background: var(--bg-secondary);
+                    border-left: 1px solid var(--border);
+                    transition: width 0.3s ease;
+                    overflow-y: auto;
+                    z-index: 999;
+                    display: flex;
+                    flex-direction: column;
+                ">
+                    <!-- Sidebar Tabs -->
+                    <div style="
+                        display: flex;
+                        gap: 0;
+                        border-bottom: 1px solid var(--border);
+                        background: var(--bg-secondary);
+                        position: sticky;
+                        top: 0;
+                    ">
+                        <button class="sidebar-tab active" onclick="window.app.showSidebarPanel('highlights')" style="
+                            flex: 1;
+                            padding: 12px;
+                            background: transparent;
+                            border: none;
+                            border-bottom: 3px solid transparent;
+                            cursor: pointer;
+                            font-size: 12px;
+                            font-weight: 600;
+                            color: var(--text-secondary);
+                            transition: all 0.3s ease;
+                        ">
+                            🖍️ Highlights
+                        </button>
+                        <button class="sidebar-tab" onclick="window.app.showSidebarPanel('notes')" style="
+                            flex: 1;
+                            padding: 12px;
+                            background: transparent;
+                            border: none;
+                            border-bottom: 3px solid transparent;
+                            cursor: pointer;
+                            font-size: 12px;
+                            font-weight: 600;
+                            color: var(--text-secondary);
+                            transition: all 0.3s ease;
+                        ">
+                            📝 Notes
+                        </button>
+                        <button class="sidebar-tab" onclick="window.app.showSidebarPanel('bookmarks')" style="
+                            flex: 1;
+                            padding: 12px;
+                            background: transparent;
+                            border: none;
+                            border-bottom: 3px solid transparent;
+                            cursor: pointer;
+                            font-size: 12px;
+                            font-weight: 600;
+                            color: var(--text-secondary);
+                            transition: all 0.3s ease;
+                        ">
+                            ⭐ Bookmarks
+                        </button>
+                    </div>
+
+                    <!-- Highlights Panel -->
+                    <div id="highlightsPanel" class="sidebar-panel" style="
+                        flex: 1;
+                        overflow-y: auto;
+                        padding: var(--pad-lg);
+                    ">
+                        <div style="margin-bottom: var(--gap-lg);">
+                            <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px;">Highlight Color</label>
+                            <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="colorPicker"></div>
+                        </div>
+                        <div id="highlightsList" style="display: flex; flex-direction: column; gap: var(--gap-md);"></div>
+                    </div>
+
+                    <!-- Notes Panel -->
+                    <div id="notesPanel" class="sidebar-panel" style="
+                        flex: 1;
+                        overflow-y: auto;
+                        padding: var(--pad-lg);
+                        display: none;
+                    ">
+                        <button class="btn-primary" onclick="window.app.openNoteModal()" style="width: 100%; margin-bottom: var(--gap-lg);">
+                            ➕ Add Note
+                        </button>
+                        <div id="notesList" style="display: flex; flex-direction: column; gap: var(--gap-md);"></div>
+                    </div>
+
+                    <!-- Bookmarks Panel -->
+                    <div id="bookmarksPanel" class="sidebar-panel" style="
+                        flex: 1;
+                        overflow-y: auto;
+                        padding: var(--pad-lg);
+                        display: none;
+                    ">
+                        <button class="btn-primary" onclick="window.app.addBookmark()" style="width: 100%; margin-bottom: var(--gap-lg);">
+                            ⭐ Bookmark Current
+                        </button>
+                        <div id="bookmarksList" style="display: flex; flex-direction: column; gap: var(--gap-md);"></div>
+                    </div>
+
+                    <!-- Close button -->
+                    <button onclick="window.app.closeSidebar()" style="
+                        position: absolute;
+                        top: 10px;
+                        left: -40px;
+                        background: var(--accent);
+                        color: white;
+                        border: none;
+                        width: 36px;
+                        height: 36px;
+                        border-radius: 50%;
+                        cursor: pointer;
+                        font-size: 18px;
+                        display: flex;
+                        align-items: center;
+                        justify-content: center;
+                        transition: all 0.3s ease;
+                    " title="Close sidebar">✕</button>
                 </div>
             </section>
 
@@ -266,6 +392,8 @@
     <script src="js/utils.js"></script>
     <script src="js/file-handler.js"></script>
     <script src="js/storage.js"></script>
+    <script src="js/highlights.js"></script>
+    <script src="js/notes.js"></script>
     <script src="js/tts.js"></script>
     <script src="js/app.js"></script>
 </body>
