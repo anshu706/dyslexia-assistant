@@ -78,6 +78,18 @@ class HighlightManager {
         return 'hl-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
     }
 
+    // Export highlights as formatted markdown text
+    exportSummary(docName = 'Document') {
+        const list = this.getAll();
+        if (list.length === 0) return `# Highlights for ${docName}\n\nNo highlights recorded.`;
+        
+        let md = `# 🖍️ Highlights Summary for ${docName}\n\n`;
+        list.forEach((h, idx) => {
+            md += `${idx + 1}. > "${h.text}"\n   *(Color: ${h.color}, Date: ${new Date(h.timestamp).toLocaleDateString()})*\n\n`;
+        });
+        return md;
+    }
+
     // Clear all highlights for this document
     clearAll() {
         this.highlights = [];

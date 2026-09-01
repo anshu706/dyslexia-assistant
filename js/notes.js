@@ -96,6 +96,20 @@ class NotesManager {
         return 'note-' + Date.now() + '-' + Math.random().toString(36).substr(2, 9);
     }
 
+    // Export notes as formatted markdown text
+    exportSummary(docName = 'Document') {
+        const list = this.getAll();
+        if (list.length === 0) return `# Notes for ${docName}\n\nNo notes recorded.`;
+        
+        let md = `# 📝 Notes Summary for ${docName}\n\n`;
+        list.forEach((n, idx) => {
+            md += `### ${idx + 1}. ${n.title}\n`;
+            md += `*Date: ${new Date(n.lastModified).toLocaleString()}*\n\n`;
+            md += `${n.content}\n\n---\n\n`;
+        });
+        return md;
+    }
+
     // Clear all notes
     clearAll() {
         this.notes = [];

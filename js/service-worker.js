@@ -13,6 +13,7 @@ const urlsToCache = [
     'js/storage.js',
     'js/highlights.js',
     'js/notes.js',
+    'js/dictionary.js',
     'js/state.js',
     'js/tts.js',
     'js/app.js'

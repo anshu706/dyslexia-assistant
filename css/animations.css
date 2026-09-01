@@ -1,257 +1,151 @@
-/* ANIMATIONS & MICRO-INTERACTIONS */
+/* ═══════════════════════════════════════
+   DYSLEXIA ASSISTANT — ANIMATIONS & FX
+═══════════════════════════════════════ */
 
+/* ── Page transitions ── */
 @keyframes fadeIn {
-    from {
-        opacity: 0;
-        transform: translateY(10px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+    from { opacity: 0; transform: translateY(10px); }
+    to   { opacity: 1; transform: translateY(0); }
 }
 
-@keyframes slideIn {
-    from {
-        opacity: 0;
-        transform: translateX(-20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
+@keyframes slideInLeft {
+    from { opacity: 0; transform: translateX(-24px); }
+    to   { opacity: 1; transform: translateX(0); }
 }
 
-@keyframes pulse {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.5;
-    }
+@keyframes slideInRight {
+    from { opacity: 0; transform: translateX(24px); }
+    to   { opacity: 1; transform: translateX(0); }
 }
 
-@keyframes bounce {
-    0%, 100% {
-        transform: translateY(0);
-    }
-    50% {
-        transform: translateY(-5px);
-    }
+@keyframes scaleIn {
+    from { opacity: 0; transform: scale(0.94); }
+    to   { opacity: 1; transform: scale(1); }
 }
 
-/* Button animations */
-.btn-primary {
-    animation: fadeIn 0.3s ease;
+@keyframes shimmer {
+    0%   { background-position: -600px 0; }
+    100% { background-position:  600px 0; }
 }
 
-.btn-primary:active {
-    transform: scale(0.98);
+@keyframes spin {
+    from { transform: rotate(0deg); }
+    to   { transform: rotate(360deg); }
 }
 
-/* Tab animations */
-.nav-tab {
-    position: relative;
+@keyframes floatUp {
+    0%, 100% { transform: translateY(0px); }
+    50%       { transform: translateY(-6px); }
 }
 
+/* ── Nav indicator slide ── */
 .nav-tab::after {
     content: '';
     position: absolute;
-    bottom: -3px;
-    left: 0;
+    bottom: -13px;
+    left: 50%;
+    transform: translateX(-50%);
     width: 0;
     height: 3px;
-    background: var(--accent);
-    transition: width 0.3s ease;
+    border-radius: var(--radius-full, 9999px);
+    background: var(--gradient-brand, linear-gradient(135deg,#6366F1,#8B5CF6));
+    transition: width 0.3s var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
 }
+.nav-tab.active::after { width: 20px; }
 
-.nav-tab.active::after {
-    width: 100%;
-}
-
-/* Page transitions */
-.page {
-    animation: fadeIn 0.3s ease;
-}
-
-/* Hover effects */
-.feature-card,
-.btn-icon,
-.upload-area {
-    transition: all 0.3s ease;
-}
-
-/* Loading animation */
-@keyframes shimmer {
-    0% {
-        background-position: -1000px 0;
-    }
-    100% {
-        background-position: 1000px 0;
-    }
-}
-
-.loading {
-    animation: shimmer 2s infinite;
-    background: linear-gradient(90deg, var(--bg-secondary), var(--bg-primary), var(--bg-secondary));
-    background-size: 1000px 100%;
-}
-
-/* Smooth scrolling */
-html {
-    scroll-behavior: smooth;
-}
-
-/* Input focus */
-input:focus,
-select:focus,
-textarea:focus {
-    box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
-}
-
-/* Disabled state */
-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
-}
-
-/* TTS ANIMATIONS */
-
-@keyframes pulse-accent {
-    0%, 100% {
-        opacity: 1;
-    }
-    50% {
-        opacity: 0.7;
-    }
-}
-
-#ttsStatus {
-    animation: pulse-accent 1s ease-in-out infinite;
+/* ── TTS Play Button ── */
+@keyframes ringPulse {
+    0%   { box-shadow: 0 0 0 0   rgba(99, 102, 241, 0.6); }
+    60%  { box-shadow: 0 0 0 12px rgba(99, 102, 241, 0); }
+    100% { box-shadow: 0 0 0 0   rgba(99, 102, 241, 0); }
 }
 
 #ttsPlayBtn.playing {
-    background: var(--accent);
+    background: var(--gradient-brand);
     color: white;
-    border-color: var(--accent);
-    animation: pulse 0.6s ease-in-out infinite;
+    border-color: transparent;
+    animation: ringPulse 1.2s ease-in-out infinite;
 }
 
-@keyframes pulse {
-    0%, 100% {
-        box-shadow: 0 0 0 0 rgba(79, 70, 229, 0.7);
-    }
-    50% {
-        box-shadow: 0 0 0 6px rgba(79, 70, 229, 0);
-    }
-}
-
-/* Highlighted word in reader */
+/* ── TTS Word Highlight ── */
 .tts-highlight {
-    background-color: #FFFF00 !important;
-    color: #000 !important;
+    background: linear-gradient(135deg, rgba(99,102,241,0.25), rgba(139,92,246,0.2)) !important;
+    color: var(--text-primary) !important;
+    outline: 2px solid rgba(99,102,241,0.5);
+    outline-offset: 1px;
+    border-radius: 4px;
     padding: 2px 4px;
-    border-radius: 2px;
-    font-weight: 600;
-    animation: fadeIn 0.2s ease;
+    font-weight: 700;
+    animation: fadeIn 0.15s ease;
 }
 
-/* FINAL POLISH & ANIMATIONS */
-
-/* Smooth page transitions */
-@keyframes pageSlideIn {
-    from {
-        opacity: 0;
-        transform: translateY(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateY(0);
-    }
+/* ── Hover lifts ── */
+.feature-card,
+.document-card,
+.stat-card {
+    will-change: transform;
 }
 
-.page {
-    animation: pageSlideIn 0.4s cubic-bezier(0.34, 1.56, 0.64, 1);
+/* ── Loading skeleton ── */
+.skeleton {
+    border-radius: 8px;
+    background: linear-gradient(
+        90deg,
+        var(--bg-tertiary) 25%,
+        var(--bg-secondary) 50%,
+        var(--bg-tertiary) 75%
+    );
+    background-size: 600px 100%;
+    animation: shimmer 1.6s infinite linear;
 }
 
-/* Statistics card hover */
-#statistics div[style*="border-left"] {
-    transition: all 0.3s ease;
-    transform: translateY(0);
+/* ── Smooth scroll ── */
+html { scroll-behavior: smooth; }
+
+/* ── Input glows ── */
+input:focus,
+select:focus,
+textarea:focus {
+    transition: box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
-#statistics div[style*="border-left"]:hover {
-    transform: translateY(-4px);
-    box-shadow: 0 8px 16px rgba(0, 0, 0, 0.1);
-}
+/* ── Button active press ── */
+.btn-primary:active  { transform: scale(0.96) !important; }
+.btn-secondary:active { transform: scale(0.97) !important; }
+.btn-icon:active     { transform: scale(0.93) !important; }
 
-/* Table hover effects */
-table tbody tr {
-    transition: background-color 0.2s ease;
-}
-
-table tbody tr:hover {
-    background-color: var(--bg-secondary);
-}
-
-/* Document card animations */
+/* ── Document card slide ── */
 .document-card {
-    transition: all 0.3s cubic-bezier(0.34, 1.56, 0.64, 1);
+    animation: fadeIn 0.35s var(--ease-spring, cubic-bezier(0.34,1.56,0.64,1));
 }
 
-.document-card:hover {
-    transform: translateX(4px);
-}
+/* ── Statistics cards stagger ── */
+.stat-card:nth-child(1) { animation: slideInLeft 0.4s 0.05s both; }
+.stat-card:nth-child(2) { animation: slideInLeft 0.4s 0.10s both; }
+.stat-card:nth-child(3) { animation: slideInLeft 0.4s 0.15s both; }
+.stat-card:nth-child(4) { animation: slideInLeft 0.4s 0.20s both; }
 
-/* Button animations */
-.btn-primary:active {
-    transform: scale(0.96);
-}
+/* ── Feature cards stagger ── */
+.feature-card:nth-child(1) { animation: scaleIn 0.35s 0.05s both; }
+.feature-card:nth-child(2) { animation: scaleIn 0.35s 0.10s both; }
+.feature-card:nth-child(3) { animation: scaleIn 0.35s 0.15s both; }
+.feature-card:nth-child(4) { animation: scaleIn 0.35s 0.20s both; }
 
-/* Loading state */
-@keyframes spin {
-    from { transform: rotate(0deg); }
-    to { transform: rotate(360deg); }
-}
+/* ── Logo icon float ── */
+.logo-icon-wrapper { animation: floatUp 4s ease-in-out infinite; }
 
-.loading {
-    animation: spin 1s linear infinite;
-}
-
-/* Success feedback */
-@keyframes slideInFromRight {
-    from {
-        opacity: 0;
-        transform: translateX(20px);
-    }
-    to {
-        opacity: 1;
-        transform: translateX(0);
-    }
-}
-
-/* Reader focus mode */
-#textDisplay:focus-within {
-    outline: 2px solid var(--accent);
-    outline-offset: -2px;
-}
-
-/* Accessibility improvements */
+/* ── Reduce motion ── */
 @media (prefers-reduced-motion: reduce) {
-    * {
+    *, *::before, *::after {
         animation-duration: 0.01ms !important;
+        animation-iteration-count: 1 !important;
         transition-duration: 0.01ms !important;
     }
 }
 
-/* Print styles */
+/* ── Print ── */
 @media print {
-    .header, .nav-tabs, .reader-controls, #sidebarContainer, .btn-icon, .btn-primary {
-        display: none;
-    }
-    
-    #textDisplay {
-        padding: 0;
-        font-size: 12pt;
-    }
+    .header, .nav-tabs, .reader-controls,
+    #sidebarContainer, .btn-icon, .btn-primary { display: none; }
+    #textDisplay { padding: 0; font-size: 12pt; }
 }

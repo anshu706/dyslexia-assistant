@@ -1,51 +1,10 @@
-/* THEME SYSTEM */
+/* ═══════════════════════════════
+   THEME SYSTEM — aligns with main.css tokens
+═══════════════════════════════ */
 
 :root {
     color-scheme: light dark;
-}
-
-/* Light Theme (Default) */
-@media (prefers-color-scheme: light) {
-    :root {
-        --bg-primary: #FFFFFF;
-        --bg-secondary: #F3F4F6;
-        --text-primary: #1F2937;
-        --text-secondary: #6B7280;
-        --text-muted: #9CA3AF;
-        --border: #E5E7EB;
-        --accent: #4F46E5;
-        --accent-light: #EEF2FF;
-    }
-}
-
-/* Dark Theme */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --bg-primary: #1F2937;
-        --bg-secondary: #111827;
-        --text-primary: #F9FAFB;
-        --text-secondary: #D1D5DB;
-        --text-muted: #9CA3AF;
-        --border: #374151;
-        --accent: #6366F1;
-        --accent-light: #1E1B4B;
-    }
-}
-
-/* Manual dark mode class */
-[data-theme="dark"] {
-    --bg-primary: #1F2937;
-    --bg-secondary: #111827;
-    --text-primary: #F9FAFB;
-    --text-secondary: #D1D5DB;
-    --text-muted: #9CA3AF;
-    --border: #374151;
-    --accent: #6366F1;
-    --accent-light: #1E1B4B;
-}
-
-/* Manual light mode class */
-[data-theme="light"] {
+    /* Design Tokens */
     --bg-primary: #FFFFFF;
     --bg-secondary: #F3F4F6;
     --text-primary: #1F2937;
@@ -54,16 +13,79 @@
     --border: #E5E7EB;
     --accent: #4F46E5;
     --accent-light: #EEF2FF;
+    --danger: #DC2626;
+    --radius-lg: 0.75rem;
+    --pad-lg: 1rem;
+    --gap-md: 0.75rem;
+    --space-2: 0.5rem;
+    --space-3: 0.75rem;
+    --space-4: 1rem;
+    --space-8: 2rem;
+    --t-fast: 0.2s;
+    /* Tint Colors */
+    --tint-none-bg: linear-gradient(135deg, #e5e7eb 50%, #fff 50%);
+    --tint-none-border: var(--border);
+    --tint-sepia-bg: #FDF6E3; --tint-sepia-border: #C5A97A;
+    --tint-yellow-bg: #FEFCE8; --tint-yellow-border: #EAB308;
+    --tint-blue-bg: #EFF6FF; --tint-blue-border: #3B82F6;
+    --tint-green-bg: #F0FDF4; --tint-green-border: #22C55E;
+    --tint-rose-bg: #FFF1F2; --tint-rose-border: #F43F5E;
 }
 
-/* Smooth transitions */
-* {
-    transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-}
 
+/* ── Smooth global transitions ── */
+*,
 input,
 select,
 button,
 textarea {
-    transition: background-color 0.2s ease, border-color 0.2s ease;
+    transition:
+        background-color 0.25s ease,
+        color 0.25s ease,
+        border-color 0.25s ease,
+        box-shadow 0.25s ease;
+}
+
+/* Exclude elements that should NOT transition (layout / positioning) */
+.btn-icon,
+.btn-close,
+.btn-primary,
+.btn-secondary,
+.btn-danger,
+.nav-tab,
+.feature-card,
+.document-card,
+.stat-card,
+.tint-option {
+    width: 28px;
+    height: 28px;
+    border-radius: 50%;
+    border: 2px solid transparent;
+    cursor: pointer;
+    transition: all var(--t-fast) ease;
+    outline: 2px solid transparent;
+    outline-offset: 2px;
+    background: var(--tint-none-bg);
+    border-color: var(--tint-none-border);
+}
+
+.tint-option:hover { transform: scale(1.15); }
+
+.tint-option.active {
+    border-color: var(--accent);
+    outline-color: var(--accent);
+    transform: scale(1.1);
+}
+
+.tint-option[data-tint="none"] {
+    background: var(--tint-none-bg);
+    border-color: var(--tint-none-border);
+}
+.tint-option[data-tint="sepia"]  { background: var(--tint-sepia-bg); border-color: var(--tint-sepia-border); }
+.tint-option[data-tint="yellow"] { background: var(--tint-yellow-bg); border-color: var(--tint-yellow-border); }
+.tint-option[data-tint="blue"]   { background: var(--tint-blue-bg);   border-color: var(--tint-blue-border); }
+.tint-option[data-tint="green"]  { background: var(--tint-green-bg);  border-color: var(--tint-green-border); }
+.tint-option[data-tint="rose"]   { background: var(--tint-rose-bg);   border-color: var(--tint-rose-border); }
+.logo-icon-wrapper {
+    transition: all 0.2s ease;
 }

@@ -4,19 +4,22 @@ A premium, accessible reading application designed specifically for dyslexic stu
 
 ## Features
 
-- 📖 **Upload Documents** - Support for PDF, DOCX, and TXT files
-- 🎵 **Text-to-Speech** - Natural language reading with speed control
-- 🎨 **Dyslexia-Friendly Settings** - Customizable fonts, spacing, and colors
-- 🎯 **Reading Tools** - Highlighting, notes, and bookmarks
-- 🌙 **Dark/Light Mode** - Comfortable viewing in any lighting
-- 📱 **Mobile Responsive** - Works on all devices
-- ⚡ **Offline Support** - Works without internet (PWA)
+- 📖 **Upload Documents** - Full support for PDF, DOCX, and TXT files with client-side text extraction
+- 🎵 **Text-to-Speech** - Natural language reading with speed, pitch, and voice controls + word highlighting
+- 🎨 **Dyslexia-Friendly Settings** - OpenDyslexic & Atkinson fonts, line height, letter spacing, Irlen color tints
+- 👁️ **Bionic Reading Mode** - Auto-highlights word prefixes for faster eye tracking
+- 📏 **Reading Focus Ruler** - Interactive position-tracking overlay for line focus
+- 🔍 **Word Lookup Dictionary** - Double-click any word for definitions, phonetics & audio pronunciations
+- 🎯 **Reading Tools** - Color highlighting, note taking, bookmarks, and in-document search
+- 📥 **Export Summaries** - Download notes and highlights in Markdown format
+- 🌙 **Dark/Light Mode** - Comfortable viewing in any lighting with system auto-detection
+- 📱 **Mobile Responsive** - Glassmorphism UI optimized across mobile, tablet, and desktop
+- ⚡ **Offline Support** - Service worker PWA with full offline document storage
 
 ## Getting Started
 
 ### Prerequisites
-- Node.js (optional, for development)
-- Modern web browser
+- Any modern web browser (Chrome, Edge, Firefox, Safari)
 
 ### Installation
 
@@ -25,62 +28,50 @@ A premium, accessible reading application designed specifically for dyslexic stu
 git clone https://github.com/YOUR-USERNAME/dyslexia-assistant.git
 cd dyslexia-assistant
 
-# Open in browser
-open index.html
+# Open in browser or serve locally
+npx http-server -p 8080 .
 ```
-
-### Deployment
-
-Hosted on GitHub Pages: `https://YOUR-USERNAME.github.io/dyslexia-assistant`
 
 ## 30-Hour Development Plan
 
 ### Week 1: Foundation (5 hours)
 - [x] Day 1: Project setup + design system
-- [ ] Day 2-5: Upload + display documents
+- [x] Day 2-5: Upload + display documents (PDF, DOCX, TXT)
 
 ### Week 2: Reading Features (5 hours)
-- [ ] Day 6-10: Text-to-speech + dyslexia features
+- [x] Day 6-10: Text-to-speech + Bionic Reading + Irlen Tints + Reading Ruler
 
 ### Week 3: Tools (10 hours)
-- [ ] Day 11-20: Highlighting + dictionary + notes
+- [x] Day 11-20: Highlighting + Free Dictionary API lookup + Notes + Bookmarks + Search
 
 ### Week 4: Polish (10 hours)
-- [ ] Day 21-30: Optimization + deployment
+- [x] Day 21-30: PWA service worker offline caching + Export tools + UI polish
 
 ## Technologies
 
-- HTML5
-- CSS3
-- Vanilla JavaScript
-- GitHub Pages (hosting)
-- Web Speech API
+- HTML5 & CSS3 (Custom Glassmorphism & Themes)
+- Vanilla JavaScript (ES6 Modules & Classes)
+- Web Speech API (Text-to-Speech Engine)
+- PDF.js & JSZip (Document Parsing)
+- Free Dictionary API (Word definitions & phonetics)
 
 ## Accessibility
 
-This project follows WCAG 2.1 guidelines and is designed with dyslexic users in mind.
+This project follows WCAG 2.1 AAA guidelines and is tailored for dyslexic users:
 
-- Dyslexia-friendly fonts (OpenDyslexic, Atkinson)
-- Adjustable font sizes and spacing
-- High contrast options
-- Keyboard navigation
-- Screen reader support
-
-## License
-
-MIT License - feel free to use and modify!
-
-## Contributors
-
-- You! 🎉
+- Dyslexia-friendly fonts (OpenDyslexic, Atkinson Hyperlegible)
+- Irlen Syndrome Color Tint Overlays (Sepia, Soft Yellow, Mint, Blue, Rose)
+- Reading Focus Ruler Overlay
+- Bionic Reading formatting
+- High contrast mode & custom letter/line spacing
 
 ## Roadmap
 
-- [ ] Advanced search
-- [ ] Dictionary integration
-- [ ] User accounts
+- [x] Advanced in-document search
+- [x] Dictionary integration & audio pronunciation
+- [x] Notes & highlights markdown export
+- [ ] Multi-language TTS voice fallback
 - [ ] Cloud sync
-- [ ] Collaboration features
 
 ---
 

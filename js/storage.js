@@ -101,7 +101,10 @@ class StorageManager {
             letterSpacing: '0.15',
             fontFamily: 'system',
             theme: 'auto',
-            contrast: false
+            contrast: false,
+            bionicReading: false,
+            readingRuler: false,
+            overlayColor: 'none'
         };
     }
 

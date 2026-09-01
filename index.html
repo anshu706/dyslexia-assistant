@@ -3,498 +3,544 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Dyslexia Assistant System - Reading made easy">
-    <meta name="theme-color" content="#1F2937">
-    
-    <title>Dyslexia Assistant</title>
-    
+    <meta name="description" content="Dyslexia Assistant — A premium, accessible reading tool with TTS, bionic reading, focus ruler, and more.">
+    <meta name="theme-color" content="#6366F1">
+    <title>Dyslexia Assistant — Read Without Limits</title>
+
     <!-- Stylesheets -->
     <link rel="stylesheet" href="css/main.css">
     <link rel="stylesheet" href="css/dyslexia.css">
     <link rel="stylesheet" href="css/themes.css">
     <link rel="stylesheet" href="css/animations.css">
-    
-    <!-- Manifest for PWA -->
+
+    <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json">
-    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='75' font-size='75' font-weight='bold' fill='%234F46E5'>D</text></svg>">
+    <!-- Inline SVG favicon -->
+    <link rel="icon" type="image/svg+xml" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><defs><linearGradient id='g' x1='0%25' y1='0%25' x2='100%25' y2='100%25'><stop offset='0%25' style='stop-color:%236366F1'/><stop offset='100%25' style='stop-color:%238B5CF6'/></linearGradient></defs><rect width='100' height='100' rx='22' fill='url(%23g)'/><text y='73' x='18' font-size='62' font-weight='900' fill='white' font-family='Arial'>D</text></svg>">
 </head>
 <body>
-    <div class="app-shell">
-        <!-- HEADER -->
-        <header class="header">
-            <div class="header-content">
-                <div class="logo">
-                    <span class="logo-icon">📖</span>
-                    <span class="logo-text">Dyslexia Assistant</span>
-                </div>
-                <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark mode">
-                    <span class="icon">🌙</span>
+<div class="app-shell">
+
+    <!-- ══════════════ HEADER ══════════════ -->
+    <header class="header">
+        <div class="header-content">
+            <div class="logo">
+                <div class="logo-icon-wrapper" aria-hidden="true">📖</div>
+                <span class="logo-text">Dyslexia Assistant</span>
+                <span class="logo-badge">Beta</span>
+            </div>
+            <div class="header-actions">
+                <button class="theme-toggle" id="themeToggle" aria-label="Toggle dark/light mode" title="Toggle theme">
+                    🌙
                 </button>
             </div>
-        </header>
+        </div>
+    </header>
 
-        <!-- NAVIGATION -->
-        <nav class="nav-tabs">
-            <button class="nav-tab active" onclick="window.app.switchPage('home')">Home</button>
-            <button class="nav-tab" onclick="window.app.switchPage('reader')">Reader</button>
-            <button class="nav-tab" onclick="window.app.switchPage('statistics')">📊 Stats</button>
-            <button class="nav-tab" onclick="window.app.switchPage('settings')">Settings</button>
-        </nav>
+    <!-- ══════════════ NAVIGATION ══════════════ -->
+    <nav class="nav-tabs" role="tablist">
+        <button class="nav-tab active" role="tab" aria-selected="true"  onclick="window.app.switchPage('home')">🏠 Home</button>
+        <button class="nav-tab"        role="tab" aria-selected="false" onclick="window.app.switchPage('reader')">📖 Reader</button>
+        <button class="nav-tab"        role="tab" aria-selected="false" onclick="window.app.switchPage('statistics')">📊 Statistics</button>
+        <button class="nav-tab"        role="tab" aria-selected="false" onclick="window.app.switchPage('settings')">⚙️ Settings</button>
+    </nav>
 
-        <!-- MAIN CONTENT -->
-        <main class="main-content">
-            <!-- HOME PAGE -->
-            <section id="home" class="page active">
-                <div class="container">
-                    <h1>Welcome to Dyslexia Assistant</h1>
-                    <p class="subtitle">A premium reading tool designed for dyslexic students</p>
-                    
-                    <div class="hero-section">
-                        <div class="feature-card">
-                            <div class="feature-icon">📤</div>
-                            <h3>Upload Documents</h3>
-                            <p>Upload PDF, DOCX, or TXT files</p>
-                        </div>
-                        <div class="feature-card">
-                            <div class="feature-icon">🎵</div>
-                            <h3>Text-to-Speech</h3>
-                            <p>Hear text read aloud naturally</p>
-                        </div>
-                        <div class="feature-card">
-                            <div class="feature-icon">🎨</div>
-                            <h3>Dyslexia Settings</h3>
-                            <p>Customize fonts, spacing, colors</p>
-                        </div>
+    <!-- ══════════════ MAIN CONTENT ══════════════ -->
+    <main class="main-content" role="main">
+
+        <!-- ─────────────── HOME PAGE ─────────────── -->
+        <section id="home" class="page active" role="tabpanel">
+            <div class="container">
+
+                <!-- Hero Banner -->
+                <div class="hero-banner" role="banner">
+                    <div class="hero-orb" aria-hidden="true"></div>
+                    <div class="hero-orb hero-orb-2" aria-hidden="true"></div>
+                    <div class="hero-content">
+                        <p class="hero-eyebrow">Accessibility First</p>
+                        <h1 class="hero-title">
+                            Read Without<br><span>Limits</span>
+                        </h1>
+                        <p class="hero-subtitle">
+                            A premium, distraction-free reading environment built specifically for dyslexic students — with TTS, bionic reading, focus ruler, and more.
+                        </p>
                     </div>
-
-                    <div class="upload-area" id="uploadArea">
-                        <input type="file" id="fileInput" accept=".pdf,.docx,.txt" style="display:none">
-                        <div class="upload-content">
-                            <div class="upload-icon">📄</div>
-                            <h2>Upload Your Document</h2>
-                            <p>Click to select or drag & drop</p>
-                            <p class="text-muted">PDF, DOCX, or TXT (Max 10MB)</p>
+                    <div class="hero-stats" aria-label="Quick stats">
+                        <div class="hero-stat">
+                            <div class="hero-stat-value" id="heroStatDocs">0</div>
+                            <div class="hero-stat-label">Documents</div>
                         </div>
-                    </div>
-
-                    <div style="display: flex; gap: var(--gap-md); margin-bottom: var(--pad-xl);">
-                        <button class="btn-primary" id="textInputBtn" style="flex: 1;">✏️ Paste Text</button>
-                    </div>
-
-                    <h2 style="margin-top: var(--pad-xl); margin-bottom: var(--gap-lg);">📚 My Documents</h2>
-                    <div id="documentsList"></div>
-                                        
-                </div>
-            </section>
-
-            <!-- READER PAGE -->
-            <section id="reader" class="page">
-                <div class="reader-container">
-                    <div class="reader-header">
-                        <h2 id="docTitle">Document Title</h2>
-                        <button class="btn-close" onclick="window.app.switchPage('home')" title="Close Reader">✕</button>
-                    </div>
-                    
-                    <div class="reader-controls">
-                        <!-- TTS Controls -->
-                        <div style="display: flex; align-items: center; gap: var(--gap-md); flex-wrap: wrap;">
-                            <button class="btn-icon" id="ttsPlayBtn" title="Play/Pause">▶</button>
-                            <button class="btn-icon" id="ttsStopBtn" title="Stop">⏹</button>
-                            
-                            <!-- Speed Control -->
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <label for="ttsSpeed" style="font-size: 12px; color: var(--text-muted);">Speed</label>
-                                <input type="range" id="ttsSpeed" min="0.5" max="2" step="0.1" value="1" title="Speed" style="width: 80px;">
-                                <span id="ttsSpeedDisplay" style="font-size: 12px; color: var(--text-secondary); min-width: 35px;">1.0x</span>
-                            </div>
-
-                            <!-- Voice Selection -->
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <label for="ttsVoice" style="font-size: 12px; color: var(--text-muted);">Voice</label>
-                                <select id="ttsVoice" style="font-size: 12px; padding: 4px 8px; border-radius: 4px; border: 1px solid var(--border); background: var(--bg-primary); color: var(--text-primary);">
-                                    <option value="0">Default</option>
-                                </select>
-                            </div>
-
-                            <!-- Pitch Control -->
-                            <div style="display: flex; align-items: center; gap: 8px;">
-                                <label for="ttsPitch" style="font-size: 12px; color: var(--text-muted);">Pitch</label>
-                                <input type="range" id="ttsPitch" min="0.5" max="2" step="0.1" value="1" style="width: 60px;">
-                                <span id="ttsPitchDisplay" style="font-size: 12px; color: var(--text-secondary); min-width: 30px;">1.0</span>
-                            </div>
+                        <div class="hero-stat">
+                            <div class="hero-stat-value" id="heroStatWords">0</div>
+                            <div class="hero-stat-label">Words Read</div>
                         </div>
-
-                        <span class="spacer"></span>
-
-                        <!-- Other Tools -->
-                        <div style="display: flex; align-items: center; gap: var(--gap-md);">
-                            <button class="btn-icon" id="highlightBtn" onclick="window.app.toggleSidebar('highlights')" title="Highlight">🖍</button>
-                            <button class="btn-icon" id="noteBtn" onclick="window.app.openNoteModal()" title="Add Note">📝</button>
-                            <button class="btn-icon" id="bookmarkBtn" onclick="window.app.addBookmark()" title="Bookmark">⭐</button>
-                        </div>
-
-                    <!-- TTS Progress Bar -->
-                    <div id="ttsProgress" style="
-                        width: 100%;
-                        height: 4px;
-                        background: var(--bg-secondary);
-                        border: none;
-                        display: none;
-                    ">
-                        <div id="ttsProgressBar" style="
-                            height: 100%;
-                            background: var(--accent);
-                            width: 0%;
-                            transition: width 0.3s ease;
-                        "></div>
-                    </div>
-
-                    <!-- Current Speaking Text -->
-                    <div id="ttsStatus" style="
-                        padding: var(--pad-md);
-                        background: var(--accent-light);
-                        color: var(--text-primary);
-                        font-size: 14px;
-                        font-weight: 500;
-                        display: none;
-                        border-bottom: 1px solid var(--border);
-                    ">
-                        <span>🎵 Reading:</span> <span id="ttsCurrentWord">...</span>
-                    </div>
-
-                    <div class="text-display" id="textDisplay">
-                        <p>Your document will appear here</p>
                     </div>
                 </div>
 
-                <!-- SIDEBAR PANELS -->
-                <div id="sidebarContainer" style="
-                    position: fixed;
-                    right: 0;
-                    top: var(--header-height);
-                    width: 0;
-                    height: calc(100vh - var(--header-height));
-                    background: var(--bg-secondary);
-                    border-left: 1px solid var(--border);
-                    transition: width 0.3s ease;
-                    overflow-y: auto;
-                    z-index: 999;
-                    display: flex;
-                    flex-direction: column;
-                ">
-                    <!-- Sidebar Tabs -->
-                    <div style="
-                        display: flex;
-                        gap: 0;
-                        border-bottom: 1px solid var(--border);
-                        background: var(--bg-secondary);
-                        position: sticky;
-                        top: 0;
-                    ">
-                        <button class="sidebar-tab active" onclick="window.app.showSidebarPanel('highlights')" style="
-                            flex: 1;
-                            padding: 12px;
-                            background: transparent;
-                            border: none;
-                            border-bottom: 3px solid transparent;
-                            cursor: pointer;
-                            font-size: 12px;
-                            font-weight: 600;
-                            color: var(--text-secondary);
-                            transition: all 0.3s ease;
-                        ">
-                            🖍️ Highlights
-                        </button>
-                        <button class="sidebar-tab" onclick="window.app.showSidebarPanel('notes')" style="
-                            flex: 1;
-                            padding: 12px;
-                            background: transparent;
-                            border: none;
-                            border-bottom: 3px solid transparent;
-                            cursor: pointer;
-                            font-size: 12px;
-                            font-weight: 600;
-                            color: var(--text-secondary);
-                            transition: all 0.3s ease;
-                        ">
-                            📝 Notes
-                        </button>
-                        <button class="sidebar-tab" onclick="window.app.showSidebarPanel('bookmarks')" style="
-                            flex: 1;
-                            padding: 12px;
-                            background: transparent;
-                            border: none;
-                            border-bottom: 3px solid transparent;
-                            cursor: pointer;
-                            font-size: 12px;
-                            font-weight: 600;
-                            color: var(--text-secondary);
-                            transition: all 0.3s ease;
-                        ">
-                            ⭐ Bookmarks
-                        </button>
+                <!-- Feature Cards -->
+                <p class="section-label">Key Features</p>
+                <div class="hero-section" aria-label="Features overview">
+                    <div class="feature-card">
+                        <span class="feature-icon">📤</span>
+                        <h3>Upload Docs</h3>
+                        <p>PDF, DOCX, or TXT — instantly readable</p>
                     </div>
-
-                    <!-- Highlights Panel -->
-                    <div id="highlightsPanel" class="sidebar-panel" style="
-                        flex: 1;
-                        overflow-y: auto;
-                        padding: var(--pad-lg);
-                    ">
-                        <div style="margin-bottom: var(--gap-lg);">
-                            <label style="display: block; margin-bottom: 8px; font-weight: 600; font-size: 14px;">Highlight Color</label>
-                            <div style="display: flex; gap: 8px; flex-wrap: wrap;" id="colorPicker"></div>
-                        </div>
-                        <div id="highlightsList" style="display: flex; flex-direction: column; gap: var(--gap-md);"></div>
+                    <div class="feature-card">
+                        <span class="feature-icon">🎵</span>
+                        <h3>Text-to-Speech</h3>
+                        <p>Natural voice with word-level highlighting</p>
                     </div>
-
-                    <!-- Notes Panel -->
-                    <div id="notesPanel" class="sidebar-panel" style="
-                        flex: 1;
-                        overflow-y: auto;
-                        padding: var(--pad-lg);
-                        display: none;
-                    ">
-                        <button class="btn-primary" onclick="window.app.openNoteModal()" style="width: 100%; margin-bottom: var(--gap-lg);">
-                            ➕ Add Note
-                        </button>
-                        <div id="notesList" style="display: flex; flex-direction: column; gap: var(--gap-md);"></div>
+                    <div class="feature-card">
+                        <span class="feature-icon">👁️</span>
+                        <h3>Bionic Reading</h3>
+                        <p>Eye-guiding bold anchors for faster reading</p>
                     </div>
-
-                    <!-- Bookmarks Panel -->
-                    <div id="bookmarksPanel" class="sidebar-panel" style="
-                        flex: 1;
-                        overflow-y: auto;
-                        padding: var(--pad-lg);
-                        display: none;
-                    ">
-                        <button class="btn-primary" onclick="window.app.addBookmark()" style="width: 100%; margin-bottom: var(--gap-lg);">
-                            ⭐ Bookmark Current
-                        </button>
-                        <div id="bookmarksList" style="display: flex; flex-direction: column; gap: var(--gap-md);"></div>
+                    <div class="feature-card">
+                        <span class="feature-icon">🎨</span>
+                        <h3>Color Tints</h3>
+                        <p>Irlen-friendly overlays to reduce visual stress</p>
                     </div>
-
-                    <!-- Close button -->
-                    <button onclick="window.app.closeSidebar()" style="
-                        position: absolute;
-                        top: 10px;
-                        left: -40px;
-                        background: var(--accent);
-                        color: white;
-                        border: none;
-                        width: 36px;
-                        height: 36px;
-                        border-radius: 50%;
-                        cursor: pointer;
-                        font-size: 18px;
-                        display: flex;
-                        align-items: center;
-                        justify-content: center;
-                        transition: all 0.3s ease;
-                    " title="Close sidebar">✕</button>
+                    <div class="feature-card">
+                        <span class="feature-icon">📏</span>
+                        <h3>Focus Ruler</h3>
+                        <p>Track your reading line with a guided ruler</p>
+                    </div>
+                    <div class="feature-card">
+                        <span class="feature-icon">📖</span>
+                        <h3>Dictionary</h3>
+                        <p>Double-click any word for instant definitions</p>
+                    </div>
                 </div>
-            </section>
 
-            <!-- STATISTICS PAGE -->
-            <section id="statistics" class="page">
-                <div class="container">
-                    <h2>📊 Reading Statistics</h2>
-
-                    <!-- Stats Grid -->
-                    <div style="
-                        display: grid;
-                        grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-                        gap: var(--gap-lg);
-                        margin-bottom: var(--pad-xl);
-                    ">
-                        <div style="
-                            background: var(--accent-light);
-                            padding: var(--pad-lg);
-                            border-radius: var(--radius-lg);
-                            border-left: 4px solid var(--accent);
-                        ">
-                            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
-                                Total Sessions
-                            </div>
-                            <div style="font-size: 28px; font-weight: 700; color: var(--accent);">
-                                <span id="statSessions">0</span>
-                            </div>
-                        </div>
-
-                        <div style="
-                            background: var(--accent-light);
-                            padding: var(--pad-lg);
-                            border-radius: var(--radius-lg);
-                            border-left: 4px solid #10B981;
-                        ">
-                            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
-                                Words Read
-                            </div>
-                            <div style="font-size: 28px; font-weight: 700; color: #10B981;">
-                                <span id="statWords">0</span>
-                            </div>
-                        </div>
-
-                        <div style="
-                            background: var(--accent-light);
-                            padding: var(--pad-lg);
-                            border-radius: var(--radius-lg);
-                            border-left: 4px solid #F59E0B;
-                        ">
-                            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
-                                Time Spent Reading
-                            </div>
-                            <div style="font-size: 28px; font-weight: 700; color: #F59E0B;">
-                                <span id="statTime">0</span>
-                            </div>
-                        </div>
-
-                        <div style="
-                            background: var(--accent-light);
-                            padding: var(--pad-lg);
-                            border-radius: var(--radius-lg);
-                            border-left: 4px solid #EF4444;
-                        ">
-                            <div style="font-size: 12px; color: var(--text-muted); margin-bottom: 8px;">
-                                Reading Streak 🔥
-                            </div>
-                            <div style="font-size: 28px; font-weight: 700; color: #EF4444;">
-                                <span id="statStreak">0</span> days
-                            </div>
-                        </div>
+                <!-- Upload Area -->
+                <div class="upload-area" id="uploadArea" role="button" aria-label="Upload a document" tabindex="0">
+                    <input type="file" id="fileInput" accept=".pdf,.docx,.txt" style="display:none" aria-label="Choose file">
+                    <div class="upload-content">
+                        <div class="upload-icon" aria-hidden="true">📄</div>
+                        <h2>Drop Your Document Here</h2>
+                        <p style="color: var(--text-secondary); font-size: 15px;">Click to browse or drag &amp; drop a file</p>
+                        <p class="text-muted">Supports PDF · DOCX · TXT &nbsp;•&nbsp; Max 10 MB</p>
+                        <button class="btn-primary" style="margin-top: var(--space-4); pointer-events: none;">
+                            📤 Browse Files
+                        </button>
                     </div>
+                </div>
 
-                    <!-- Recent Activity -->
-                    <h3 style="margin-bottom: var(--gap-lg);">📖 Recent Reading Sessions</h3>
-                    <div id="recentSessions" style="
-                        background: var(--bg-secondary);
-                        border-radius: var(--radius-lg);
-                        padding: var(--pad-lg);
-                    "></div>
-
-                    <!-- Clear Stats Button -->
-                    <button class="btn-primary" onclick="if(confirm('Are you sure? This cannot be undone.')) { window.app.stats.clearAll(); window.app.updateStatistics(); alert('✅ Statistics cleared'); }" style="
-                        background: var(--danger);
-                        margin-top: var(--pad-xl);
-                    ">
-                        🗑️ Clear All Statistics
+                <!-- Paste text -->
+                <div style="display: flex; gap: var(--space-3); margin-bottom: var(--space-8);">
+                    <button class="btn-secondary" id="textInputBtn" style="flex: 1; padding: 12px; font-size: 14px;">
+                        ✏️ Paste Text Instead
                     </button>
                 </div>
-            </section>
 
-            <!-- SETTINGS PAGE -->
-            <section id="settings" class="page">
-                <div class="container">
-                    <h2>Settings</h2>
-                    
-                    <div class="settings-group">
-                        <h3>Font Settings</h3>
-                        <div class="setting-item">
-                            <label for="fontFamily">Font Family</label>
-                            <select id="fontFamily">
-                                <option value="system">System Default</option>
-                                <option value="opendyslexic">OpenDyslexic</option>
-                                <option value="atkinson">Atkinson Hyperlegible</option>
-                            </select>
-                        </div>
-
-                        <div class="setting-item">
-                            <label for="fontSize">Font Size</label>
-                            <input type="range" id="fontSize" min="14" max="32" step="2" value="18">
-                            <span id="fontSizeDisplay">18px</span>
-                        </div>
-
-                        <div class="setting-item">
-                            <label for="lineHeight">Line Height</label>
-                            <input type="range" id="lineHeight" min="1.2" max="2.5" step="0.1" value="1.8">
-                            <span id="lineHeightDisplay">1.8</span>
-                        </div>
-
-                        <div class="setting-item">
-                            <label for="letterSpacing">Letter Spacing</label>
-                            <input type="range" id="letterSpacing" min="0" max="0.5" step="0.05" value="0.15">
-                            <span id="letterSpacingDisplay">0.15em</span>
-                        </div>
-                    </div>
-
-                    <div class="settings-group">
-                        <h3>Display Settings</h3>
-                        <div class="setting-item">
-                            <label for="theme">Color Theme</label>
-                            <select id="theme">
-                                <option value="light">Light</option>
-                                <option value="dark">Dark</option>
-                                <option value="auto">Auto (System)</option>
-                            </select>
-                        </div>
-
-                        <div class="setting-item">
-                            <label for="contrast">High Contrast</label>
-                            <input type="checkbox" id="contrast">
-                        </div>
-                    </div>
-
-                    <button class="btn-primary" id="saveSettingsBtn">Save Settings</button>
+                <!-- Documents List -->
+                <div style="display: flex; align-items: center; justify-content: space-between; margin-bottom: var(--space-4);">
+                    <h2 style="margin: 0;">📚 My Documents</h2>
+                    <span class="text-muted" id="docsCount">No documents yet</span>
                 </div>
-            </section>
-        </main>
-    </div>
+                <div id="documentsList"></div>
 
-    <!-- Custom Modal for Paste Text -->
-    <div id="pasteModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content">
-            <div class="modal-header">
-                <h2>Paste Document Text</h2>
-                <button class="btn-close" id="closePasteModal">&times;</button>
             </div>
-            <div class="modal-body">
-                <textarea id="pasteTextarea" placeholder="Enter or paste your text here..."></textarea>
+        </section>
+
+        <!-- ─────────────── READER PAGE ─────────────── -->
+        <section id="reader" class="page" role="tabpanel">
+            <div class="reader-container">
+
+                <!-- Reader Header -->
+                <div class="reader-header">
+                    <button class="btn-icon" onclick="window.app.switchPage('home')" title="Back to Home" aria-label="Back to Home" style="flex-shrink:0;">
+                        ← 
+                    </button>
+                    <h2 id="docTitle">Document Title</h2>
+                    <button class="btn-close" onclick="window.app.switchPage('home')" title="Close Reader" aria-label="Close reader">✕</button>
+                </div>
+
+                <!-- Reader Toolbar -->
+                <div class="reader-controls" role="toolbar" aria-label="Reading controls">
+
+                    <!-- TTS Group -->
+                    <div class="control-group">
+                        <span class="control-label">TTS</span>
+                        <button class="btn-icon" id="ttsPlayBtn" title="Play / Pause (Space)" aria-label="Play or pause text-to-speech">▶</button>
+                        <button class="btn-icon" id="ttsStopBtn" title="Stop" aria-label="Stop text-to-speech">⏹</button>
+                    </div>
+
+                    <!-- Speed Group -->
+                    <div class="control-group">
+                        <span class="control-label">Speed</span>
+                        <input type="range" id="ttsSpeed" min="0.5" max="2" step="0.1" value="1" title="Reading speed" aria-label="Reading speed" style="width:80px;">
+                        <span class="speed-display" id="ttsSpeedDisplay">1.0×</span>
+                    </div>
+
+                    <!-- Voice Group -->
+                    <div class="control-group">
+                        <span class="control-label">Voice</span>
+                        <select id="ttsVoice" class="control-select" aria-label="Select TTS voice">
+                            <option value="0">Default</option>
+                        </select>
+                    </div>
+
+                    <!-- Pitch Group -->
+                    <div class="control-group">
+                        <span class="control-label">Pitch</span>
+                        <input type="range" id="ttsPitch" min="0.5" max="2" step="0.1" value="1" style="width:60px;" aria-label="Voice pitch">
+                        <span class="control-display" id="ttsPitchDisplay">1.0</span>
+                    </div>
+
+                    <span class="spacer"></span>
+
+                    <!-- Tools Group -->
+                    <div class="control-group" style="border-right:none; gap: var(--space-2);">
+                        <!-- Search -->
+                        <div class="reader-search-wrapper">
+                            <input type="text" id="readerSearchInput" class="reader-search-input"
+                                placeholder="Search text..." aria-label="Search document text">
+                        </div>
+
+                        <!-- Tint picker inline dots -->
+                        <div class="tint-picker" aria-label="Color tint selector">
+                            <button class="tint-option active" data-tint="none"   title="No tint"     aria-label="Remove tint"></button>
+                            <button class="tint-option" data-tint="sepia"  title="Sepia"      aria-label="Sepia tint"></button>
+                            <button class="tint-option" data-tint="yellow" title="Soft Yellow" aria-label="Soft yellow tint"></button>
+                            <button class="tint-option" data-tint="blue"   title="Soft Blue"   aria-label="Soft blue tint"></button>
+                            <button class="tint-option" data-tint="green"  title="Soft Mint"   aria-label="Soft mint tint"></button>
+                            <button class="tint-option" data-tint="rose"   title="Soft Rose"   aria-label="Soft rose tint"></button>
+                        </div>
+
+                        <button class="btn-icon" id="bionicBtn"    onclick="window.app.toggleBionicReading()" title="Toggle Bionic Reading" aria-label="Toggle bionic reading">👁️</button>
+                        <button class="btn-icon" id="rulerBtn"     onclick="window.app.toggleReadingRuler()"  title="Toggle Focus Ruler"    aria-label="Toggle reading ruler">📏</button>
+                        <button class="btn-icon" id="highlightBtn" onclick="window.app.toggleSidebar('highlights')" title="Highlights" aria-label="Open highlights">🖍</button>
+                        <button class="btn-icon" id="noteBtn"      onclick="window.app.openNoteModal()" title="Add Note" aria-label="Add note">📝</button>
+                        <button class="btn-icon" id="bookmarkBtn"  onclick="window.app.addBookmark()"   title="Bookmark" aria-label="Add bookmark">⭐</button>
+                    </div>
+                </div>
+
+                <!-- TTS Progress Bar -->
+                <div id="ttsProgress" style="width:100%; height:3px; background:var(--bg-tertiary); display:none; flex-shrink:0;">
+                    <div id="ttsProgressBar" style="height:100%; background:var(--gradient-brand); width:0%; transition:width 0.4s ease;"></div>
+                </div>
+
+                <!-- TTS Status -->
+                <div id="ttsStatus" style="
+                    padding: 8px 24px;
+                    background: linear-gradient(90deg, var(--accent-light), transparent);
+                    color: var(--accent);
+                    font-size: 13px;
+                    font-weight: 600;
+                    display: none;
+                    border-bottom: 1px solid var(--border);
+                    flex-shrink: 0;
+                ">
+                    🎵 Reading: <span id="ttsCurrentWord" style="font-weight:700;">...</span>
+                </div>
+
+                <!-- Text Display -->
+                <div class="text-display" id="textDisplay" role="article" aria-live="polite">
+                    <p style="color: var(--text-muted); text-align:center; margin-top: 80px;">
+                        📄 Your document will appear here.<br>
+                        <small>Upload or paste a document from the <a onclick="window.app.switchPage('home')" style="color:var(--accent); cursor:pointer; text-decoration:underline;">Home page</a>.</small>
+                    </p>
+                </div>
+
             </div>
-            <div class="modal-footer">
-                <button class="btn-secondary" id="cancelPasteBtn">Cancel</button>
-                <button class="btn-primary" id="submitPasteBtn" style="margin-top: 0;">Add to Reader</button>
+
+            <!-- ── SIDEBAR ── -->
+            <div id="sidebarContainer">
+
+                <!-- Sidebar Tab Bar -->
+                <div class="sidebar-tab-bar">
+                    <button class="sidebar-tab active" onclick="window.app.showSidebarPanel('highlights')" aria-label="Highlights panel">🖍️ Highlights</button>
+                    <button class="sidebar-tab"        onclick="window.app.showSidebarPanel('notes')"      aria-label="Notes panel">📝 Notes</button>
+                    <button class="sidebar-tab"        onclick="window.app.showSidebarPanel('bookmarks')"  aria-label="Bookmarks panel">⭐ Bookmarks</button>
+                </div>
+
+                <!-- Highlights Panel -->
+                <div id="highlightsPanel" class="sidebar-panel">
+                    <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:var(--space-4);">
+                        <p class="section-label" style="margin:0;">Highlight Color</p>
+                        <button class="btn-secondary" onclick="window.app.exportHighlights()" style="padding:4px 10px; font-size:11px;">
+                            📥 Export
+                        </button>
+                    </div>
+                    <div id="colorPicker" style="display:flex; gap:var(--space-2); flex-wrap:wrap; margin-bottom:var(--space-5);"></div>
+                    <div id="highlightsList" style="display:flex; flex-direction:column; gap:var(--space-2);"></div>
+                </div>
+
+                <!-- Notes Panel -->
+                <div id="notesPanel" class="sidebar-panel" style="display:none;">
+                    <div style="display:flex; gap:var(--space-2); margin-bottom:var(--space-5);">
+                        <button class="btn-primary" onclick="window.app.openNoteModal()" style="flex:1; margin-top:0; font-size:13px;">
+                            ➕ Add Note
+                        </button>
+                        <button class="btn-secondary" onclick="window.app.exportNotes()" style="padding:10px 12px;">
+                            📥
+                        </button>
+                    </div>
+                    <div id="notesList" style="display:flex; flex-direction:column; gap:var(--space-3);"></div>
+                </div>
+
+                <!-- Bookmarks Panel -->
+                <div id="bookmarksPanel" class="sidebar-panel" style="display:none;">
+                    <button class="btn-primary" onclick="window.app.addBookmark()" style="width:100%; margin-bottom:var(--space-5);">
+                        ⭐ Bookmark Current Position
+                    </button>
+                    <div id="bookmarksList" style="display:flex; flex-direction:column; gap:var(--space-2);"></div>
+                </div>
+
+                <!-- Close Sidebar Button -->
+                <button class="sidebar-close-btn" onclick="window.app.closeSidebar()" title="Close panel" aria-label="Close sidebar">✕</button>
             </div>
+        </section>
+
+        <!-- ─────────────── STATISTICS PAGE ─────────────── -->
+        <section id="statistics" class="page" role="tabpanel">
+            <div class="container">
+                <h1>📊 Reading Statistics</h1>
+                <p class="subtitle">Track your reading progress and build consistent habits.</p>
+
+                <!-- Stats Cards -->
+                <div class="stats-grid">
+                    <div class="stat-card stat-sessions">
+                        <div class="stat-icon">🗓️</div>
+                        <div class="stat-label">Total Sessions</div>
+                        <div class="stat-value" id="statSessions">0</div>
+                    </div>
+                    <div class="stat-card stat-words">
+                        <div class="stat-icon">📝</div>
+                        <div class="stat-label">Words Read</div>
+                        <div class="stat-value" id="statWords">0</div>
+                    </div>
+                    <div class="stat-card stat-time">
+                        <div class="stat-icon">⏱️</div>
+                        <div class="stat-label">Time Reading</div>
+                        <div class="stat-value" id="statTime">0m</div>
+                    </div>
+                    <div class="stat-card stat-streak">
+                        <div class="stat-icon">🔥</div>
+                        <div class="stat-label">Day Streak</div>
+                        <div class="stat-value"><span id="statStreak">0</span><span style="font-size:18px; font-weight:500; color:var(--text-muted);"> days</span></div>
+                    </div>
+                </div>
+
+                <!-- Recent Sessions -->
+                <h3 style="margin-bottom:var(--space-4);">📖 Recent Sessions</h3>
+                <div id="recentSessions" style="
+                    background: var(--bg-primary);
+                    border: 1px solid var(--border);
+                    border-radius: var(--radius-xl);
+                    padding: var(--space-6);
+                    min-height: 80px;
+                "></div>
+
+                <!-- Clear Stats -->
+                <button class="btn-danger"
+                    onclick="if(confirm('Clear all statistics? This cannot be undone.')) { window.app.stats.clearAll(); window.app.updateStatistics(); }"
+                    style="margin-top: var(--space-10);">
+                    🗑️ Clear All Statistics
+                </button>
+            </div>
+        </section>
+
+        <!-- ─────────────── SETTINGS PAGE ─────────────── -->
+        <section id="settings" class="page" role="tabpanel">
+            <div class="container">
+                <h1>⚙️ Settings</h1>
+                <p class="subtitle">Customize your reading environment for maximum comfort.</p>
+
+                <!-- Font Settings -->
+                <div class="settings-group">
+                    <div class="settings-group-header">
+                        <div class="settings-group-icon">🔤</div>
+                        <div>
+                            <div class="settings-group-title">Typography</div>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="fontFamily">Font Family</label>
+                        <select id="fontFamily" aria-label="Font family">
+                            <option value="system">System Default (Inter)</option>
+                            <option value="opendyslexic">OpenDyslexic</option>
+                            <option value="atkinson">Atkinson Hyperlegible</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="fontSize">Font Size</label>
+                        <input type="range" id="fontSize" min="14" max="32" step="2" value="18" aria-label="Font size">
+                        <span id="fontSizeDisplay">18px</span>
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="lineHeight">Line Height</label>
+                        <input type="range" id="lineHeight" min="1.2" max="2.5" step="0.1" value="1.8" aria-label="Line height">
+                        <span id="lineHeightDisplay">1.8</span>
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="letterSpacing">Letter Spacing</label>
+                        <input type="range" id="letterSpacing" min="0" max="0.5" step="0.05" value="0.15" aria-label="Letter spacing">
+                        <span id="letterSpacingDisplay">0.15em</span>
+                    </div>
+                </div>
+
+                <!-- Display Settings -->
+                <div class="settings-group">
+                    <div class="settings-group-header">
+                        <div class="settings-group-icon">🖥️</div>
+                        <div>
+                            <div class="settings-group-title">Display & Accessibility</div>
+                        </div>
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="theme">Color Theme</label>
+                        <select id="theme" aria-label="Color theme">
+                            <option value="light">☀️ Light</option>
+                            <option value="dark">🌙 Dark</option>
+                            <option value="auto">🌓 Auto (System)</option>
+                        </select>
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="contrast">High Contrast</label>
+                        <label class="toggle-switch" for="contrast" aria-label="High contrast mode">
+                            <input type="checkbox" id="contrast">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="bionicToggle">Bionic Reading</label>
+                        <label class="toggle-switch" for="bionicToggle" aria-label="Bionic reading mode">
+                            <input type="checkbox" id="bionicToggle" onchange="window.app.toggleBionicReading(this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+
+                    <div class="setting-item">
+                        <label for="rulerToggle">Reading Ruler</label>
+                        <label class="toggle-switch" for="rulerToggle" aria-label="Reading ruler">
+                            <input type="checkbox" id="rulerToggle" onchange="window.app.toggleReadingRuler(this.checked)">
+                            <span class="toggle-slider"></span>
+                        </label>
+                    </div>
+                </div>
+
+                <button class="btn-primary" id="saveSettingsBtn" style="font-size:15px; padding:12px 28px;">
+                    💾 Save Settings
+                </button>
+            </div>
+        </section>
+    </main>
+</div>
+
+<!-- ══════════════ MODALS ══════════════ -->
+
+<!-- Paste Text Modal -->
+<div id="pasteModal" class="modal-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="pasteModalTitle">
+    <div class="modal-content">
+        <div class="modal-header">
+            <h2 id="pasteModalTitle">✏️ Paste Document Text</h2>
+            <button class="btn-close" id="closePasteModal" aria-label="Close modal">&times;</button>
+        </div>
+        <div class="modal-body">
+            <textarea id="pasteTextarea" placeholder="Paste or type your text here…" aria-label="Document text input"></textarea>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" id="cancelPasteBtn">Cancel</button>
+            <button class="btn-primary" id="submitPasteBtn" style="margin-top:0;">Add to Reader →</button>
         </div>
     </div>
+</div>
 
-    <!-- Custom Confirm Modal -->
-    <div id="confirmModal" class="modal-overlay" style="display: none;">
-        <div class="modal-content confirm-modal-content">
-            <div class="modal-header">
-                <h2>Delete Document</h2>
-            </div>
-            <div class="modal-body">
-                <p>Are you sure you want to delete this document? This action cannot be undone.</p>
-            </div>
-            <div class="modal-footer">
-                <button class="btn-secondary" id="cancelDeleteBtn">Cancel</button>
-                <button class="btn-danger" id="confirmDeleteBtn">Delete</button>
-            </div>
+<!-- Confirm Delete Modal -->
+<div id="confirmModal" class="modal-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="confirmModalTitle">
+    <div class="modal-content confirm-modal-content">
+        <div class="modal-header">
+            <h2 id="confirmModalTitle">🗑️ Delete Document</h2>
+        </div>
+        <div class="modal-body">
+            <p>Are you sure you want to delete this document? This action <strong>cannot</strong> be undone.</p>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" id="cancelDeleteBtn">Cancel</button>
+            <button class="btn-danger"    id="confirmDeleteBtn">Delete Permanently</button>
         </div>
     </div>
+</div>
 
-    <!-- Toast Notification Container -->
-    <div id="toastContainer" class="toast-container"></div>
+<!-- Dictionary Modal -->
+<div id="dictionaryModal" class="modal-overlay" style="display:none;" role="dialog" aria-modal="true" aria-labelledby="dictWordTitle">
+    <div class="modal-content" style="max-width:520px;">
+        <div class="modal-header">
+            <h2 id="dictWordTitle" style="font-size:16px; font-weight:700; margin:0;">📖 Definition</h2>
+            <button class="btn-close" id="closeDictModal" onclick="document.getElementById('dictionaryModal').style.display='none'" aria-label="Close dictionary">&times;</button>
+        </div>
+        <div class="modal-body" id="dictModalBody" style="max-height:450px; overflow-y:auto;">
+            <div class="loading">🔍 Fetching definition…</div>
+        </div>
+        <div class="modal-footer">
+            <button class="btn-secondary" onclick="document.getElementById('dictionaryModal').style.display='none'">Close</button>
+        </div>
+    </div>
+</div>
 
-    <!-- Scripts and Libraries -->
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
-    <script src="js/utils.js"></script>
-    <script src="js/file-handler.js"></script>
-    <script src="js/storage.js"></script>
-    <script src="js/highlights.js"></script>
-    <script src="js/notes.js"></script>
-    <script src="js/state.js"></script>
-    <script src="js/tts.js"></script>
-    <script src="js/app.js"></script>
+<!-- ══════════════ TOASTS & EXTRAS ══════════════ -->
+<div id="toastContainer" class="toast-container" aria-live="polite" aria-label="Notifications"></div>
 
-    <!-- Service Worker for offline support -->
-    <script>
-        if ('serviceWorker' in navigator) {
-            navigator.serviceWorker.register('js/service-worker.js')
-                .then(registration => console.log('✅ Service Worker registered'))
-                .catch(error => console.log('⚠️ Service Worker registration failed:', error));
-        }
-    </script>
+<!-- Reading Ruler Overlay -->
+<div id="readingRuler" role="presentation" aria-hidden="true"></div>
+
+<!-- ══════════════ SCRIPTS ══════════════ -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+<script src="js/utils.js"></script>
+<script src="js/file-handler.js"></script>
+<script src="js/storage.js"></script>
+<script src="js/highlights.js"></script>
+<script src="js/notes.js"></script>
+<script src="js/dictionary.js"></script>
+<script src="js/state.js"></script>
+<script src="js/tts.js"></script>
+<script src="js/app.js"></script>
+
+<!-- Tint picker wiring -->
+<script>
+    document.querySelectorAll('.tint-option').forEach(btn => {
+        btn.addEventListener('click', () => {
+            document.querySelectorAll('.tint-option').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            if (window.app && window.app.setOverlayColor) {
+                window.app.setOverlayColor(btn.dataset.tint);
+            }
+        });
+    });
+
+    // Update hero stats on load
+    document.addEventListener('DOMContentLoaded', () => {
+        setTimeout(() => {
+            if (window.app) {
+                const docs = window.app.storage ? window.app.storage.getDocuments() : [];
+                document.getElementById('heroStatDocs').textContent = docs.length || 0;
+                const stats = window.app.stats ? window.app.stats.getStats() : null;
+                if (stats) {
+                    const w = stats.totalWordsRead || 0;
+                    document.getElementById('heroStatWords').textContent = w > 999 ? (w/1000).toFixed(1)+'k' : w;
+                }
+            }
+        }, 500);
+    });
+</script>
+
+<!-- Service Worker -->
+<script>
+    if ('serviceWorker' in navigator) {
+        navigator.serviceWorker.register('js/service-worker.js')
+            .then(() => console.log('✅ SW registered'))
+            .catch(e => console.log('⚠️ SW failed:', e));
+    }
+</script>
 </body>
 </html>

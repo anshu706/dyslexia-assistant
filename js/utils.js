@@ -37,7 +37,20 @@ const Utils = {
     },
 
     // Deep clone
-    deepClone: (obj) => JSON.parse(JSON.stringify(obj))
+    deepClone: (obj) => JSON.parse(JSON.stringify(obj)),
+
+    // Apply Bionic Reading formatting (bolding initial letters of words)
+    applyBionicReading: (text) => {
+        if (!text) return '';
+        return text.replace(/\b[a-zA-Z0-9']+\b/g, (word) => {
+            const len = word.length;
+            let mid = 1;
+            if (len >= 4 && len <= 6) mid = 2;
+            else if (len >= 7 && len <= 9) mid = 3;
+            else if (len >= 10) mid = 4;
+            return `<b>${word.slice(0, mid)}</b>${word.slice(mid)}`;
+        });
+    }
 };
 
 // Export for Node.js compatibility

@@ -13,7 +13,10 @@ class DyslexiaAssistant {
         this.sidebarOpen = false;
         this.currentSidebarPanel = 'highlights';
         this.stats = new ReadingStats();
+        this.dictionary = new DictionaryManager();
         this.readingStartTime = null;
+        this.bionicEnabled = false;
+        this.rulerEnabled = false;
         this.init();
     }
 
@@ -115,6 +118,11 @@ class DyslexiaAssistant {
         document.getElementById('theme').addEventListener('change', (e) => this.updateTheme(e.target.value));
         document.getElementById('contrast').addEventListener('change', (e) => this.updateContrast(e.target.checked));
         document.getElementById('saveSettingsBtn').addEventListener('click', () => this.saveSettings());
+
+        // Document In-App Search & Ruler Trackers
+        document.getElementById('readerSearchInput')?.addEventListener('input', (e) => this.searchInDocument(e.target.value));
+        document.addEventListener('mousemove', (e) => this.updateRulerPosition(e));
+        document.getElementById('textDisplay')?.addEventListener('dblclick', (e) => this.handleWordLookup(e));
 
         // Custom Modal Event Listeners
         document.getElementById('closePasteModal').addEventListener('click', () => this.hidePasteModal());
@@ -250,6 +258,7 @@ class DyslexiaAssistant {
                     </p>
                 </div>
             `;
+            document.getElementById('docsCount').textContent = '0';
             return;
         }
 
@@ -287,6 +296,7 @@ class DyslexiaAssistant {
                 </div>
             </div>
         `).join('');
+        document.getElementById('docsCount').textContent = documents.length;
     }
 
     // DELETE DOCUMENT
@@ -369,12 +379,23 @@ class DyslexiaAssistant {
         document.getElementById('theme').value = this.settings.theme;
         document.getElementById('contrast').checked = this.settings.contrast;
 
+        const bionicCheckbox = document.getElementById('bionicToggle');
+        if (bionicCheckbox) bionicCheckbox.checked = !!this.settings.bionicReading;
+        const rulerCheckbox = document.getElementById('rulerToggle');
+        if (rulerCheckbox) rulerCheckbox.checked = !!this.settings.readingRuler;
+        const tintSelect = document.getElementById('tintSelect');
+        if (tintSelect) tintSelect.value = this.settings.overlayColor || 'none';
+
         this.updateFontSize(this.settings.fontSize);
         this.updateLineHeight(this.settings.lineHeight);
         this.updateLetterSpacing(this.settings.letterSpacing);
         this.updateFontFamily(this.settings.fontFamily);
         this.updateTheme(this.settings.theme);
         this.updateContrast(this.settings.contrast);
+
+        if (this.settings.bionicReading) this.toggleBionicReading(true);
+        if (this.settings.readingRuler) this.toggleReadingRuler(true);
+        if (this.settings.overlayColor) this.setOverlayColor(this.settings.overlayColor);
     }
 
     registerServiceWorker() {
@@ -1022,6 +1043,179 @@ class DyslexiaAssistant {
                 </tbody>
             </table>
         `;
+    }
+
+    // BIONIC READING MODE
+    toggleBionicReading(forcedState) {
+        this.bionicEnabled = forcedState !== undefined ? forcedState : !this.bionicEnabled;
+        const textDisplay = document.getElementById('textDisplay');
+        const bionicBtn = document.getElementById('bionicBtn');
+        const bionicCheckbox = document.getElementById('bionicToggle');
+
+        if (!textDisplay || !this.currentDoc) return;
+
+        if (this.bionicEnabled) {
+            const formatted = this.currentDoc.content
+                .split('\n\n')
+                .filter(p => p.trim())
+                .map(p => `<p class="bionic-reading">${Utils.applyBionicReading(this.escapeHtml(p.trim()))}</p>`)
+                .join('');
+            textDisplay.innerHTML = formatted;
+            if (bionicBtn) bionicBtn.style.borderColor = 'var(--accent)';
+            if (bionicCheckbox) bionicCheckbox.checked = true;
+            this.showToast('Bionic Reading enabled', 'info');
+        } else {
+            textDisplay.innerHTML = this.formatContent(this.currentDoc.content);
+            if (bionicBtn) bionicBtn.style.borderColor = 'var(--border)';
+            if (bionicCheckbox) bionicCheckbox.checked = false;
+        }
+
+        this.settings.bionicReading = this.bionicEnabled;
+        this.storage.saveSettings(this.settings);
+    }
+
+    // READING RULER
+    toggleReadingRuler(forcedState) {
+        this.rulerEnabled = forcedState !== undefined ? forcedState : !this.rulerEnabled;
+        const ruler = document.getElementById('readingRuler');
+        const rulerBtn = document.getElementById('rulerBtn');
+        const rulerCheckbox = document.getElementById('rulerToggle');
+
+        if (ruler) {
+            ruler.style.display = this.rulerEnabled ? 'block' : 'none';
+        }
+        if (rulerBtn) {
+            rulerBtn.style.borderColor = this.rulerEnabled ? 'var(--accent)' : 'var(--border)';
+        }
+        if (rulerCheckbox) {
+            rulerCheckbox.checked = this.rulerEnabled;
+        }
+
+        this.settings.readingRuler = this.rulerEnabled;
+        this.storage.saveSettings(this.settings);
+        if (this.rulerEnabled) this.showToast('Reading Ruler active', 'info');
+    }
+
+    updateRulerPosition(e) {
+        if (!this.rulerEnabled) return;
+        const ruler = document.getElementById('readingRuler');
+        if (ruler) {
+            ruler.style.top = `${e.clientY - 21}px`;
+        }
+    }
+
+    // COLOR OVERLAY TINTS
+    setOverlayColor(color) {
+        const textDisplay = document.getElementById('textDisplay');
+        if (!textDisplay) return;
+
+        textDisplay.classList.remove('tint-sepia', 'tint-yellow', 'tint-blue', 'tint-green', 'tint-rose');
+        if (color && color !== 'none') {
+            textDisplay.classList.add(`tint-${color}`);
+        }
+
+        this.settings.overlayColor = color;
+        this.storage.saveSettings(this.settings);
+    }
+
+    // IN-DOCUMENT SEARCH
+    searchInDocument(query) {
+        const textDisplay = document.getElementById('textDisplay');
+        if (!textDisplay || !this.currentDoc) return;
+
+        if (!query || query.trim().length === 0) {
+            textDisplay.innerHTML = this.formatContent(this.currentDoc.content);
+            if (this.bionicEnabled) this.toggleBionicReading(true);
+            return;
+        }
+
+        const cleanQuery = this.escapeRegex(query.trim());
+        const regex = new RegExp(`(${cleanQuery})`, 'gi');
+        const paragraphs = textDisplay.querySelectorAll('p');
+
+        paragraphs.forEach(p => {
+            p.innerHTML = p.innerText.replace(
+                regex,
+                '<mark style="background-color: #F59E0B; color: white; padding: 2px 4px; border-radius: 2px;">$1</mark>'
+            );
+        });
+    }
+
+    // DICTIONARY WORD LOOKUP
+    async handleWordLookup(e) {
+        let selected = window.getSelection().toString().trim();
+        if (!selected) {
+            const range = document.caretRangeFromPoint ? document.caretRangeFromPoint(e.clientX, e.clientY) : null;
+            if (range) {
+                range.expand('word');
+                selected = range.toString().trim();
+            }
+        }
+
+        if (!selected || selected.length < 2 || selected.includes(' ')) return;
+
+        const modal = document.getElementById('dictionaryModal');
+        const title = document.getElementById('dictWordTitle');
+        const body = document.getElementById('dictModalBody');
+
+        title.textContent = `📖 "${selected}"`;
+        body.innerHTML = '<div style="padding: 20px; text-align: center; color: var(--text-muted);">🔍 Fetching definition...</div>';
+        modal.style.display = 'flex';
+
+        const info = await this.dictionary.lookupWord(selected);
+
+        if (!info || !info.found) {
+            body.innerHTML = `<p style="color: var(--text-secondary); text-align: center;">${info?.message || 'No definition found.'}</p>`;
+            return;
+        }
+
+        let html = `<div style="margin-bottom: 12px; display: flex; align-items: center; justify-content: space-between;">
+            <span style="font-size: 16px; font-weight: 700; color: var(--accent);">${info.word}</span>
+            <span style="font-size: 14px; color: var(--text-muted);">${info.phonetic}</span>
+            ${info.audioUrl ? `<button onclick="window.app.dictionary.playAudio('${info.audioUrl}')" class="btn-icon" style="width: 32px; height: 32px; font-size: 14px;" title="Listen">🔊</button>` : ''}
+        </div>`;
+
+        info.meanings.forEach(m => {
+            html += `<div style="margin-bottom: 12px; border-top: 1px solid var(--border); padding-top: 8px;">
+                <div style="font-size: 12px; font-weight: 700; color: var(--text-secondary); text-transform: uppercase; margin-bottom: 4px;">${m.partOfSpeech}</div>`;
+            m.definitions.forEach((d, idx) => {
+                html += `<div style="font-size: 14px; margin-bottom: 4px; color: var(--text-primary);">${idx + 1}. ${this.escapeHtml(d.definition)}</div>`;
+                if (d.example) {
+                    html += `<div style="font-size: 12px; font-style: italic; color: var(--text-muted); margin-left: 12px; margin-bottom: 4px;">"${this.escapeHtml(d.example)}"</div>`;
+                }
+            });
+            if (m.synonyms && m.synonyms.length > 0) {
+                html += `<div style="font-size: 12px; color: var(--accent); margin-top: 4px;">Synonyms: ${m.synonyms.join(', ')}</div>`;
+            }
+            html += `</div>`;
+        });
+
+        body.innerHTML = html;
+    }
+
+    // EXPORT NOTES & HIGHLIGHTS
+    exportNotes() {
+        if (!this.notesManager || !this.currentDoc) return;
+        const text = this.notesManager.exportSummary(this.currentDoc.name);
+        this.downloadFile(`${this.currentDoc.name}-notes.md`, text);
+        this.showToast('Notes exported successfully', 'success');
+    }
+
+    exportHighlights() {
+        if (!this.highlightManager || !this.currentDoc) return;
+        const text = this.highlightManager.exportSummary(this.currentDoc.name);
+        this.downloadFile(`${this.currentDoc.name}-highlights.md`, text);
+        this.showToast('Highlights exported successfully', 'success');
+    }
+
+    downloadFile(filename, content) {
+        const element = document.createElement('a');
+        element.setAttribute('href', 'data:text/plain;charset=utf-8,' + encodeURIComponent(content));
+        element.setAttribute('download', filename);
+        element.style.display = 'none';
+        document.body.appendChild(element);
+        element.click();
+        document.body.removeChild(element);
     }
 
 }
