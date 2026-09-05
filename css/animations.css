@@ -1,151 +1,200 @@
-/* ═══════════════════════════════════════
-   DYSLEXIA ASSISTANT — ANIMATIONS & FX
-═══════════════════════════════════════ */
+/* ════════════════════════════════════════════
+   DYSLEXIA ASSISTANT  ·  ANIMATIONS v2
+   Premium keyframes + motion design
+════════════════════════════════════════════ */
 
-/* ── Page transitions ── */
+/* ── Page Transitions ── */
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(10px); }
-    to   { opacity: 1; transform: translateY(0); }
+  from { opacity:0; transform:translateY(12px); }
+  to   { opacity:1; transform:translateY(0); }
 }
-
+@keyframes fadeInUp {
+  from { opacity:0; transform:translateY(20px) scale(0.98); }
+  to   { opacity:1; transform:translateY(0)    scale(1); }
+}
 @keyframes slideInLeft {
-    from { opacity: 0; transform: translateX(-24px); }
-    to   { opacity: 1; transform: translateX(0); }
+  from { opacity:0; transform:translateX(-28px); }
+  to   { opacity:1; transform:translateX(0); }
 }
-
 @keyframes slideInRight {
-    from { opacity: 0; transform: translateX(24px); }
-    to   { opacity: 1; transform: translateX(0); }
+  from { opacity:0; transform:translateX(28px); }
+  to   { opacity:1; transform:translateX(0); }
 }
-
 @keyframes scaleIn {
-    from { opacity: 0; transform: scale(0.94); }
-    to   { opacity: 1; transform: scale(1); }
+  from { opacity:0; transform:scale(0.92); }
+  to   { opacity:1; transform:scale(1); }
 }
 
+/* ── Hero mesh drift ── */
+@keyframes meshDrift {
+  0%   { transform:scale(1)    rotate(0deg); }
+  100% { transform:scale(1.08) rotate(3deg); }
+}
+
+/* ── Orb float ── */
+@keyframes orbDrift {
+  0%,100% { transform:translate(0,0)       scale(1); }
+  33%      { transform:translate(14px,-20px) scale(1.07); }
+  66%      { transform:translate(-8px,12px)  scale(0.94); }
+}
+
+/* ── Logo float ── */
+@keyframes logoFloat {
+  0%,100% { transform:translateY(0); }
+  50%      { transform:translateY(-3px); }
+}
+
+/* ── Upload bounce ── */
+@keyframes uploadBounce {
+  0%,100% { transform:translateY(0); }
+  50%      { transform:translateY(-7px); }
+}
+
+/* ── Gradient slide (header bar) ── */
+@keyframes gradientSlide {
+  0%   { background-position:0%   0%; }
+  100% { background-position:200% 0%; }
+}
+
+/* ── Border pulse (upload area) ── */
+@keyframes borderPulse {
+  0%,100% { border-color:var(--border-strong); }
+  50%      { border-color:var(--border-glow); }
+}
+
+/* ── Shimmer (buttons, skeletons) ── */
 @keyframes shimmer {
-    0%   { background-position: -600px 0; }
-    100% { background-position:  600px 0; }
+  0%   { background-position:-600px 0; }
+  100% { background-position: 600px 0; }
 }
 
+/* ── Spin ── */
 @keyframes spin {
-    from { transform: rotate(0deg); }
-    to   { transform: rotate(360deg); }
+  from { transform:rotate(0deg); }
+  to   { transform:rotate(360deg); }
 }
 
-@keyframes floatUp {
-    0%, 100% { transform: translateY(0px); }
-    50%       { transform: translateY(-6px); }
-}
-
-/* ── Nav indicator slide ── */
-.nav-tab::after {
-    content: '';
-    position: absolute;
-    bottom: -13px;
-    left: 50%;
-    transform: translateX(-50%);
-    width: 0;
-    height: 3px;
-    border-radius: var(--radius-full, 9999px);
-    background: var(--gradient-brand, linear-gradient(135deg,#6366F1,#8B5CF6));
-    transition: width 0.3s var(--ease-spring, cubic-bezier(0.34, 1.56, 0.64, 1));
-}
-.nav-tab.active::after { width: 20px; }
-
-/* ── TTS Play Button ── */
+/* ── TTS ring pulse ── */
 @keyframes ringPulse {
-    0%   { box-shadow: 0 0 0 0   rgba(99, 102, 241, 0.6); }
-    60%  { box-shadow: 0 0 0 12px rgba(99, 102, 241, 0); }
-    100% { box-shadow: 0 0 0 0   rgba(99, 102, 241, 0); }
+  0%   { box-shadow:0 0 0 0    rgba(99,102,241,0.65); }
+  60%  { box-shadow:0 0 0 14px rgba(99,102,241,0); }
+  100% { box-shadow:0 0 0 0    rgba(99,102,241,0); }
 }
-
 #ttsPlayBtn.playing {
-    background: var(--gradient-brand);
-    color: white;
-    border-color: transparent;
-    animation: ringPulse 1.2s ease-in-out infinite;
+  background: var(--gradient-brand);
+  color: white;
+  border-color: transparent;
+  animation: ringPulse 1.3s ease-in-out infinite;
 }
 
-/* ── TTS Word Highlight ── */
+/* ── TTS word highlight ── */
 .tts-highlight {
-    background: linear-gradient(135deg, rgba(99,102,241,0.25), rgba(139,92,246,0.2)) !important;
-    color: var(--text-primary) !important;
-    outline: 2px solid rgba(99,102,241,0.5);
-    outline-offset: 1px;
-    border-radius: 4px;
-    padding: 2px 4px;
-    font-weight: 700;
-    animation: fadeIn 0.15s ease;
+  background: linear-gradient(135deg,rgba(99,102,241,0.22),rgba(139,92,246,0.18)) !important;
+  color: var(--text-primary) !important;
+  outline: 2px solid rgba(99,102,241,0.45);
+  outline-offset: 1px;
+  border-radius: 4px;
+  padding: 2px 4px;
+  font-weight: 700;
+  animation: fadeIn 0.15s ease;
 }
+
+/* ── Nav indicator ── */
+.nav-tab::after {
+  content: '';
+  position: absolute;
+  bottom: -1px; left: 50%;
+  transform: translateX(-50%);
+  width: 0; height: 2.5px;
+  border-radius: 9999px;
+  background: var(--gradient-brand);
+  box-shadow: 0 0 8px var(--accent-glow);
+  transition: width 0.3s cubic-bezier(0.34,1.56,0.64,1);
+}
+.nav-tab.active::after { width: 16px; }
 
 /* ── Hover lifts ── */
 .feature-card,
 .document-card,
-.stat-card {
-    will-change: transform;
-}
+.stat-card { will-change: transform; }
 
-/* ── Loading skeleton ── */
-.skeleton {
-    border-radius: 8px;
-    background: linear-gradient(
-        90deg,
-        var(--bg-tertiary) 25%,
-        var(--bg-secondary) 50%,
-        var(--bg-tertiary) 75%
-    );
-    background-size: 600px 100%;
-    animation: shimmer 1.6s infinite linear;
-}
+/* ── Card stagger — feature cards ── */
+.feature-card:nth-child(1) { animation: scaleIn 0.38s 0.04s both; }
+.feature-card:nth-child(2) { animation: scaleIn 0.38s 0.09s both; }
+.feature-card:nth-child(3) { animation: scaleIn 0.38s 0.14s both; }
+.feature-card:nth-child(4) { animation: scaleIn 0.38s 0.19s both; }
+.feature-card:nth-child(5) { animation: scaleIn 0.38s 0.24s both; }
+.feature-card:nth-child(6) { animation: scaleIn 0.38s 0.29s both; }
 
-/* ── Smooth scroll ── */
-html { scroll-behavior: smooth; }
+/* ── Card stagger — stat cards ── */
+.stat-card:nth-child(1) { animation: fadeInUp 0.4s 0.05s both; }
+.stat-card:nth-child(2) { animation: fadeInUp 0.4s 0.10s both; }
+.stat-card:nth-child(3) { animation: fadeInUp 0.4s 0.15s both; }
+.stat-card:nth-child(4) { animation: fadeInUp 0.4s 0.20s both; }
+
+/* ── Document card ── */
+.document-card { animation: fadeIn 0.32s var(--ease-spring, cubic-bezier(0.34,1.56,0.64,1)); }
 
 /* ── Input glows ── */
 input:focus,
 select:focus,
 textarea:focus {
-    transition: box-shadow 0.15s ease, border-color 0.15s ease;
+  transition: box-shadow 0.15s ease, border-color 0.15s ease;
 }
 
-/* ── Button active press ── */
-.btn-primary:active  { transform: scale(0.96) !important; }
-.btn-secondary:active { transform: scale(0.97) !important; }
-.btn-icon:active     { transform: scale(0.93) !important; }
+/* ── Button press ── */
+.btn-primary:active   { transform: scale(0.95) !important; }
+.btn-secondary:active { transform: scale(0.96) !important; }
+.btn-icon:active      { transform: scale(0.88) !important; }
 
-/* ── Document card slide ── */
-.document-card {
-    animation: fadeIn 0.35s var(--ease-spring, cubic-bezier(0.34,1.56,0.64,1));
+/* ── Popup fade-in ── */
+@keyframes popupFadeIn {
+  from { opacity:0; transform:translateY(8px)  scale(0.95); }
+  to   { opacity:1; transform:translateY(0)     scale(1); }
 }
 
-/* ── Statistics cards stagger ── */
-.stat-card:nth-child(1) { animation: slideInLeft 0.4s 0.05s both; }
-.stat-card:nth-child(2) { animation: slideInLeft 0.4s 0.10s both; }
-.stat-card:nth-child(3) { animation: slideInLeft 0.4s 0.15s both; }
-.stat-card:nth-child(4) { animation: slideInLeft 0.4s 0.20s both; }
+/* ── Status pulse ── */
+@keyframes statusPulse {
+  0%,100% { opacity:1; }
+  50%      { opacity:0.65; }
+}
 
-/* ── Feature cards stagger ── */
-.feature-card:nth-child(1) { animation: scaleIn 0.35s 0.05s both; }
-.feature-card:nth-child(2) { animation: scaleIn 0.35s 0.10s both; }
-.feature-card:nth-child(3) { animation: scaleIn 0.35s 0.15s both; }
-.feature-card:nth-child(4) { animation: scaleIn 0.35s 0.20s both; }
+/* ── Overlay in ── */
+@keyframes overlayIn {
+  from { opacity:0; }
+  to   { opacity:1; }
+}
 
-/* ── Logo icon float ── */
-.logo-icon-wrapper { animation: floatUp 4s ease-in-out infinite; }
+/* ── Modal spring ── */
+@keyframes modalIn {
+  from { opacity:0; transform:translateY(28px) scale(0.95); }
+  to   { opacity:1; transform:translateY(0)    scale(1); }
+}
+
+/* ── Toast ── */
+@keyframes toastIn {
+  from { opacity:0; transform:translateX(100%) scale(0.9); }
+  to   { opacity:1; transform:translateX(0)    scale(1); }
+}
+@keyframes toastFadeOut {
+  to { opacity:0; transform:translateX(40px) scale(0.95); }
+}
+
+/* ── Smooth scroll ── */
+html { scroll-behavior: smooth; }
 
 /* ── Reduce motion ── */
 @media (prefers-reduced-motion: reduce) {
-    *, *::before, *::after {
-        animation-duration: 0.01ms !important;
-        animation-iteration-count: 1 !important;
-        transition-duration: 0.01ms !important;
-    }
+  *, *::before, *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+  }
 }
 
 /* ── Print ── */
 @media print {
-    .header, .nav-tabs, .reader-controls,
-    #sidebarContainer, .btn-icon, .btn-primary { display: none; }
-    #textDisplay { padding: 0; font-size: 12pt; }
+  .header, .nav-tabs, .reader-controls,
+  #sidebarContainer, .btn-icon, .btn-primary { display: none; }
+  #textDisplay { padding: 0; font-size: 12pt; }
 }

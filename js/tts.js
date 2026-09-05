@@ -13,6 +13,7 @@ class TextToSpeech {
             pitch: 1,
             volume: 1
         };
+        this.preferredVoice = null;
         this.callbacks = {};
         this.currentUtterance = null;
         this.wordHighlights = {};
@@ -29,6 +30,21 @@ class TextToSpeech {
             onWordChange
         };
         this.getAvailableVoices();
+
+        // Try to set Indian voice immediately; voices may load async
+        this.preferredVoice = this.getIndianVoice();
+        if (!this.preferredVoice) {
+            // Voices may not be ready yet — wait for the voiceschanged event
+            this.synth.addEventListener('voiceschanged', () => {
+                this.preferredVoice = this.getIndianVoice();
+                if (this.preferredVoice) {
+                    console.log(`🇮🇳 Indian voice loaded: ${this.preferredVoice.name}`);
+                }
+            }, { once: true });
+        } else {
+            console.log(`🇮🇳 Indian voice set: ${this.preferredVoice.name}`);
+        }
+
         console.log('✅ Text-to-Speech initialized');
     }
 
@@ -37,6 +53,26 @@ class TextToSpeech {
         const voices = this.synth.getVoices();
         console.log(`🎵 Found ${voices.length} voices:`, voices.map(v => v.name));
         return voices;
+    }
+
+    // Find the best available Indian voice (en-IN preferred, then hi-IN)
+    getIndianVoice() {
+        const voices = this.synth.getVoices();
+        if (!voices.length) return null;
+
+        // Priority order: en-IN female > en-IN any > hi-IN any
+        const priorities = [
+            v => v.lang === 'en-IN' && /female|woman/i.test(v.name),
+            v => v.lang === 'en-IN',
+            v => v.lang === 'hi-IN',
+            v => v.lang.startsWith('en-IN'),
+        ];
+
+        for (const match of priorities) {
+            const found = voices.find(match);
+            if (found) return found;
+        }
+        return null; // fallback: browser default
     }
 
     // Prepare text for speech
@@ -57,11 +93,19 @@ class TextToSpeech {
             if (trimmed.length === 0) return;
 
             const utterance = new SpeechSynthesisUtterance(trimmed);
-            
+
             // Apply settings
             utterance.rate = this.settings.rate;
             utterance.pitch = this.settings.pitch;
             utterance.volume = this.settings.volume;
+
+            // Apply Indian voice if available
+            if (this.preferredVoice) {
+                utterance.voice = this.preferredVoice;
+                utterance.lang = this.preferredVoice.lang;
+            } else {
+                utterance.lang = 'en-IN'; // hint the browser even without an explicit voice
+            }
 
             // Event handlers
             utterance.onstart = () => {
@@ -191,13 +235,33 @@ class TextToSpeech {
         console.log(`🔊 Volume set to ${(volume * 100).toFixed(0)}%`);
     }
 
-    // Set voice
+    // Set voice by index
     setVoice(voiceIndex) {
         const voices = this.synth.getVoices();
         if (voiceIndex >= 0 && voiceIndex < voices.length) {
-            this.utterances.forEach(u => u.voice = voices[voiceIndex]);
+            this.preferredVoice = voices[voiceIndex];
+            this.utterances.forEach(u => {
+                u.voice = this.preferredVoice;
+                u.lang = this.preferredVoice.lang;
+            });
             console.log(`🎤 Voice set to: ${voices[voiceIndex].name}`);
         }
+    }
+
+    // Force Indian voice (call anytime to re-apply)
+    setIndianVoice() {
+        const voice = this.getIndianVoice();
+        if (voice) {
+            this.preferredVoice = voice;
+            this.utterances.forEach(u => {
+                u.voice = voice;
+                u.lang = voice.lang;
+            });
+            console.log(`🇮🇳 Indian voice applied: ${voice.name}`);
+            return voice.name;
+        }
+        console.warn('⚠️ No Indian voice found on this browser/OS');
+        return null;
     }
 
     // Get current status
