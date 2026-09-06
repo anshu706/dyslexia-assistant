@@ -686,15 +686,7 @@
                 <div class="stat-icon">⏱️</div>
                 <div class="stat-label">Time Reading</div>
                 <div class="stat-value">
-                  <span class="counter" id="statTime">0</span
-                  ><span
-                    style="
-                      font-size: 18px;
-                      font-weight: 700;
-                      color: var(--text-muted);
-                    "
-                    >m</span
-                  >
+                  <span class="counter" id="statTime">0</span>
                 </div>
               </div>
               <div class="stat-card stat-streak">
@@ -1065,7 +1057,7 @@
         setTimeout(() => {
           if (window.app) {
             const docs = window.app.storage
-              ? window.app.storage.getDocuments()
+              ? window.app.storage.getAllDocuments()
               : [];
             document.getElementById("heroStatDocs").textContent =
               docs.length || 0;

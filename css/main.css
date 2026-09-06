@@ -326,13 +326,12 @@ body {
   display: flex;
   align-items: center;
   gap: 2px;
-  background: var(--bg-glass);
-  backdrop-filter: blur(16px);
-  -webkit-backdrop-filter: blur(16px);
+  background: var(--bg-primary);
   border-bottom: 1px solid var(--border);
   overflow-x: auto;
   scrollbar-width: none;
   position: relative;
+  z-index: 999;
 }
 .nav-tabs::-webkit-scrollbar { display:none; }
 
@@ -403,7 +402,7 @@ body {
 .container {
   max-width: 960px;
   margin: 0 auto;
-  padding: var(--space-8);
+  padding: var(--space-8) var(--space-8) var(--space-12) var(--space-8);
   width: 100%;
 }
 
