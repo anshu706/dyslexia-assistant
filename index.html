@@ -21,6 +21,7 @@
     <link rel="stylesheet" href="css/dyslexia.css" />
     <link rel="stylesheet" href="css/themes.css" />
     <link rel="stylesheet" href="css/animations.css" />
+    <link rel="stylesheet" href="css/auth.css" />
 
     <!-- PWA Manifest -->
     <link rel="manifest" href="manifest.json" />
@@ -66,6 +67,45 @@
             >
               🌙
             </button>
+            <!-- Auth: shown when logged out -->
+            <button
+              id="headerSignInBtn"
+              aria-label="Sign in"
+              style="display: none"
+            >
+              <span>✨</span> Sign In
+            </button>
+            <!-- Auth: shown when logged in -->
+            <div
+              id="headerUserBtn"
+              style="display: none"
+              aria-label="User menu"
+              aria-haspopup="true"
+              aria-expanded="false"
+              role="button"
+              tabindex="0"
+            >
+              <div class="header-user-avatar" id="headerUserAvatar"></div>
+              <span class="header-user-name" id="headerUserName"></span>
+              <span style="font-size: 10px; color: var(--text-muted)">▾</span>
+              <div class="user-dropdown" id="userDropdown" role="menu">
+                <button
+                  class="user-dropdown-item"
+                  id="dropdownProfile"
+                  role="menuitem"
+                >
+                  👤 My Profile
+                </button>
+                <div class="user-dropdown-divider"></div>
+                <button
+                  class="user-dropdown-item danger"
+                  id="dropdownLogout"
+                  role="menuitem"
+                >
+                  🚪 Sign Out
+                </button>
+              </div>
+            </div>
           </div>
         </div>
       </header>
@@ -103,6 +143,16 @@
           onclick="window.app.switchPage('settings')"
         >
           ⚙️ Settings
+        </button>
+        <button
+          class="nav-tab"
+          id="profileNavTab"
+          role="tab"
+          aria-selected="false"
+          onclick="window.app.switchPage('profile')"
+          style="display: none"
+        >
+          👤 Profile
         </button>
       </nav>
 
@@ -879,7 +929,466 @@
             </button>
           </div>
         </section>
+
+        <!-- ─────────────── PROFILE PAGE ─────────────── -->
+        <section
+          id="profile"
+          class="page"
+          role="tabpanel"
+          style="overflow-y: auto"
+        >
+          <div class="profile-page">
+            <!-- Hero banner -->
+            <div class="profile-hero">
+              <div class="profile-hero-orb profile-hero-orb-1"></div>
+              <div class="profile-hero-orb profile-hero-orb-2"></div>
+              <div class="profile-hero-inner">
+                <div class="profile-avatar-wrap">
+                  <div class="profile-avatar" id="profileAvatar"></div>
+                  <div
+                    class="profile-avatar-edit"
+                    title="Edit profile"
+                    onclick="
+                      document.getElementById('profileNameInput').focus()
+                    "
+                  >
+                    ✏️
+                  </div>
+                </div>
+                <div class="profile-hero-info">
+                  <div class="profile-hero-name" id="profileHeroName">—</div>
+                  <div class="profile-hero-email" id="profileHeroEmail">—</div>
+                  <div class="profile-hero-meta">
+                    <span class="profile-meta-chip" id="profileJoinedChip"
+                      >📅 Joined recently</span
+                    >
+                    <span
+                      class="profile-meta-chip"
+                      id="profileLocationChip"
+                      style="display: none"
+                      >📍 <span id="profileLocationText"></span
+                    ></span>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Stats strip -->
+            <div class="profile-stats-strip">
+              <div class="profile-stat-card">
+                <div class="profile-stat-icon">📚</div>
+                <div class="profile-stat-value" id="profileStatDocs">0</div>
+                <div class="profile-stat-label">Documents</div>
+              </div>
+              <div class="profile-stat-card">
+                <div class="profile-stat-icon">📝</div>
+                <div class="profile-stat-value" id="profileStatWords">0</div>
+                <div class="profile-stat-label">Words Read</div>
+              </div>
+              <div class="profile-stat-card">
+                <div class="profile-stat-icon">⏱️</div>
+                <div class="profile-stat-value" id="profileStatSessions">0</div>
+                <div class="profile-stat-label">Sessions</div>
+              </div>
+            </div>
+
+            <!-- Edit profile section -->
+            <div class="profile-section">
+              <div class="profile-section-header">
+                <div class="profile-section-icon">👤</div>
+                <span class="profile-section-title">Personal Information</span>
+              </div>
+              <div class="profile-section-body">
+                <div class="profile-form-error" id="profileInfoError"></div>
+                <div class="profile-form-grid">
+                  <div class="profile-field">
+                    <label for="profileNameInput">Full Name</label>
+                    <input
+                      type="text"
+                      id="profileNameInput"
+                      class="profile-input"
+                      placeholder="Your full name"
+                      autocomplete="name"
+                    />
+                  </div>
+                  <div class="profile-field">
+                    <label>Email Address</label>
+                    <input
+                      type="email"
+                      class="profile-input"
+                      id="profileEmailDisplay"
+                      disabled
+                      style="opacity: 0.6; cursor: not-allowed"
+                    />
+                  </div>
+                  <div class="profile-field">
+                    <label for="profileLocationInput">Location</label>
+                    <input
+                      type="text"
+                      id="profileLocationInput"
+                      class="profile-input"
+                      placeholder="City, Country"
+                      autocomplete="country-name"
+                    />
+                  </div>
+                  <div class="profile-field">
+                    <label for="profileWebsiteInput">Website</label>
+                    <input
+                      type="url"
+                      id="profileWebsiteInput"
+                      class="profile-input"
+                      placeholder="https://example.com"
+                      autocomplete="url"
+                    />
+                  </div>
+                  <div class="profile-field span-2">
+                    <label for="profileBioInput">Bio</label>
+                    <textarea
+                      id="profileBioInput"
+                      class="profile-input"
+                      placeholder="Tell us a little about yourself…"
+                      rows="3"
+                    ></textarea>
+                  </div>
+                </div>
+                <div class="profile-form-actions">
+                  <button
+                    class="btn-secondary"
+                    id="profileInfoReset"
+                    style="font-size: 14px; padding: 9px 18px"
+                  >
+                    Reset
+                  </button>
+                  <button
+                    class="btn-primary"
+                    id="profileInfoSave"
+                    style="font-size: 14px; padding: 9px 20px"
+                  >
+                    💾 Save Changes
+                  </button>
+                </div>
+              </div>
+            </div>
+
+            <!-- Change password -->
+            <div class="profile-section">
+              <div class="profile-section-header">
+                <div class="profile-section-icon">🔒</div>
+                <span class="profile-section-title">Change Password</span>
+              </div>
+              <div class="profile-section-body">
+                <div class="profile-form-error" id="profilePwError"></div>
+                <div class="pw-change-form">
+                  <div class="profile-field">
+                    <label for="profileCurrentPw">Current Password</label>
+                    <div class="pw-input-wrap">
+                      <input
+                        type="password"
+                        id="profileCurrentPw"
+                        placeholder="••••••••"
+                        autocomplete="current-password"
+                      />
+                      <button
+                        class="pw-input-toggle"
+                        type="button"
+                        onclick="
+                          window.authUI.togglePw('profileCurrentPw', this)
+                        "
+                      >
+                        👁
+                      </button>
+                    </div>
+                  </div>
+                  <div class="profile-field">
+                    <label for="profileNewPw">New Password</label>
+                    <div class="pw-input-wrap">
+                      <input
+                        type="password"
+                        id="profileNewPw"
+                        placeholder="Min. 6 characters"
+                        autocomplete="new-password"
+                      />
+                      <button
+                        class="pw-input-toggle"
+                        type="button"
+                        onclick="window.authUI.togglePw('profileNewPw', this)"
+                      >
+                        👁
+                      </button>
+                    </div>
+                  </div>
+                  <div class="profile-field">
+                    <label for="profileConfirmPw">Confirm New Password</label>
+                    <div class="pw-input-wrap">
+                      <input
+                        type="password"
+                        id="profileConfirmPw"
+                        placeholder="Repeat new password"
+                        autocomplete="new-password"
+                      />
+                      <button
+                        class="pw-input-toggle"
+                        type="button"
+                        onclick="
+                          window.authUI.togglePw('profileConfirmPw', this)
+                        "
+                      >
+                        👁
+                      </button>
+                    </div>
+                  </div>
+                  <div
+                    class="profile-form-actions"
+                    style="margin-top: 4px; padding-top: 12px"
+                  >
+                    <button
+                      class="btn-primary"
+                      id="profilePwSave"
+                      style="font-size: 14px; padding: 9px 20px"
+                    >
+                      🔑 Update Password
+                    </button>
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <!-- Danger zone -->
+            <div class="profile-section danger-zone">
+              <div class="profile-section-header">
+                <div class="profile-section-icon">⚠️</div>
+                <span class="profile-section-title">Danger Zone</span>
+              </div>
+              <div class="profile-section-body">
+                <div class="danger-action">
+                  <div class="danger-action-info">
+                    <h4>Sign Out</h4>
+                    <p>Log out from your current session on this device.</p>
+                  </div>
+                  <button
+                    class="btn-secondary"
+                    id="profileLogoutBtn"
+                    style="
+                      font-size: 14px;
+                      padding: 9px 18px;
+                      border-color: var(--danger);
+                      color: var(--danger);
+                    "
+                  >
+                    🚪 Sign Out
+                  </button>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
       </main>
+    </div>
+
+    <!-- ══════════════ AUTH OVERLAY ══════════════ -->
+    <div
+      id="authOverlay"
+      role="dialog"
+      aria-modal="true"
+      aria-label="Sign in or create account"
+    >
+      <div class="auth-orb auth-orb-1"></div>
+      <div class="auth-orb auth-orb-2"></div>
+      <div class="auth-orb auth-orb-3"></div>
+
+      <div class="auth-card">
+        <!-- Logo -->
+        <div class="auth-logo">
+          <div class="auth-logo-icon">📖</div>
+          <span class="auth-logo-text">Dyslexia Assistant</span>
+          <span class="auth-logo-badge">Beta</span>
+        </div>
+
+        <!-- Tabs -->
+        <div class="auth-tabs" role="tablist">
+          <button
+            class="auth-tab active"
+            id="authTabLogin"
+            role="tab"
+            aria-selected="true"
+            onclick="window.authUI.showPanel('login')"
+          >
+            Sign In
+          </button>
+          <button
+            class="auth-tab"
+            id="authTabSignup"
+            role="tab"
+            aria-selected="false"
+            onclick="window.authUI.showPanel('signup')"
+          >
+            Create Account
+          </button>
+        </div>
+
+        <!-- Login Panel -->
+        <div class="auth-panel active" id="authPanelLogin" role="tabpanel">
+          <h2 class="auth-title">Welcome back!</h2>
+          <p class="auth-subtitle">
+            Sign in to access your documents and preferences.
+          </p>
+
+          <div class="auth-error" id="loginError"></div>
+
+          <div class="auth-field">
+            <label for="loginEmail">Email Address</label>
+            <div class="auth-input-wrap">
+              <span class="field-icon">✉️</span>
+              <input
+                type="email"
+                id="loginEmail"
+                class="auth-input"
+                placeholder="you@example.com"
+                autocomplete="email"
+              />
+            </div>
+          </div>
+          <div class="auth-field">
+            <label for="loginPassword">Password</label>
+            <div class="auth-input-wrap">
+              <span class="field-icon">🔒</span>
+              <input
+                type="password"
+                id="loginPassword"
+                class="auth-input"
+                placeholder="••••••••"
+                autocomplete="current-password"
+              />
+              <button
+                type="button"
+                class="pw-toggle"
+                onclick="window.authUI.togglePw('loginPassword', this)"
+                aria-label="Toggle password visibility"
+              >
+                👁
+              </button>
+            </div>
+          </div>
+
+          <button
+            class="auth-submit"
+            id="loginBtn"
+            onclick="window.authUI.handleLogin()"
+          >
+            Sign In
+          </button>
+
+          <div class="auth-guest">
+            <button
+              class="auth-guest-link"
+              onclick="window.authUI.continueAsGuest()"
+            >
+              Continue as guest (no account)
+            </button>
+          </div>
+        </div>
+
+        <!-- Sign Up Panel -->
+        <div class="auth-panel" id="authPanelSignup" role="tabpanel">
+          <h2 class="auth-title">Create your account</h2>
+          <p class="auth-subtitle">Free forever. No credit card needed.</p>
+
+          <div class="auth-error" id="signupError"></div>
+
+          <div class="auth-field">
+            <label for="signupName">Full Name</label>
+            <div class="auth-input-wrap">
+              <span class="field-icon">👤</span>
+              <input
+                type="text"
+                id="signupName"
+                class="auth-input"
+                placeholder="Jane Doe"
+                autocomplete="name"
+              />
+            </div>
+          </div>
+          <div class="auth-field">
+            <label for="signupEmail">Email Address</label>
+            <div class="auth-input-wrap">
+              <span class="field-icon">✉️</span>
+              <input
+                type="email"
+                id="signupEmail"
+                class="auth-input"
+                placeholder="you@example.com"
+                autocomplete="email"
+              />
+            </div>
+          </div>
+          <div class="auth-field">
+            <label for="signupPassword">Password</label>
+            <div class="auth-input-wrap">
+              <span class="field-icon">🔒</span>
+              <input
+                type="password"
+                id="signupPassword"
+                class="auth-input"
+                placeholder="Min. 6 characters"
+                autocomplete="new-password"
+              />
+              <button
+                type="button"
+                class="pw-toggle"
+                onclick="window.authUI.togglePw('signupPassword', this)"
+                aria-label="Toggle password visibility"
+              >
+                👁
+              </button>
+            </div>
+            <div class="pw-strength" id="pwStrength">
+              <div class="pw-strength-bar" id="pwBar1"></div>
+              <div class="pw-strength-bar" id="pwBar2"></div>
+              <div class="pw-strength-bar" id="pwBar3"></div>
+              <div class="pw-strength-bar" id="pwBar4"></div>
+              <span class="pw-strength-label" id="pwStrengthLabel"></span>
+            </div>
+          </div>
+          <div class="auth-field">
+            <label for="signupConfirm">Confirm Password</label>
+            <div class="auth-input-wrap">
+              <span class="field-icon">🔒</span>
+              <input
+                type="password"
+                id="signupConfirm"
+                class="auth-input"
+                placeholder="Repeat password"
+                autocomplete="new-password"
+              />
+              <button
+                type="button"
+                class="pw-toggle"
+                onclick="window.authUI.togglePw('signupConfirm', this)"
+                aria-label="Toggle password visibility"
+              >
+                👁
+              </button>
+            </div>
+          </div>
+
+          <button
+            class="auth-submit"
+            id="signupBtn"
+            onclick="window.authUI.handleSignup()"
+          >
+            Create Account
+          </button>
+
+          <div class="auth-guest">
+            <button
+              class="auth-guest-link"
+              onclick="window.authUI.continueAsGuest()"
+            >
+              Continue as guest (no account)
+            </button>
+          </div>
+        </div>
+      </div>
     </div>
 
     <!-- ══════════════ MODALS ══════════════ -->
@@ -1036,6 +1545,8 @@
     <script src="js/dictionary.js"></script>
     <script src="js/state.js"></script>
     <script src="js/tts.js"></script>
+    <script src="js/auth.js"></script>
+    <script src="js/authUI.js"></script>
     <script src="js/app.js"></script>
 
     <!-- Tint picker wiring -->
@@ -1061,7 +1572,9 @@
               : [];
             document.getElementById("heroStatDocs").textContent =
               docs.length || 0;
-            const stats = window.app.stats ? window.app.stats.getStats() : null;
+            const stats = window.app.stats
+              ? window.app.stats.getTotalStats()
+              : null;
             if (stats) {
               const w = stats.totalWordsRead || 0;
               document.getElementById("heroStatWords").textContent =

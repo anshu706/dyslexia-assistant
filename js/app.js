@@ -56,13 +56,7 @@ class DyslexiaAssistant {
   }
 
   setupEventListeners() {
-    // Navigation tabs
-    document.querySelectorAll(".nav-tab").forEach((tab, index) => {
-      tab.addEventListener("click", () => {
-        const pages = ["home", "reader", "statistics", "settings"];
-        this.switchPage(pages[index]);
-      });
-    });
+    // Navigation tabs — handled by inline onclick on each button
 
     // TTS Controls
     document
@@ -228,7 +222,7 @@ class DyslexiaAssistant {
     document
       .querySelectorAll(".nav-tab")
       .forEach((tab) => tab.classList.remove("active"));
-    const pageIndex = { home: 0, reader: 1, statistics: 2, settings: 3 };
+    const pageIndex = { home: 0, reader: 1, statistics: 2, settings: 3, profile: 4 };
     if (pageIndex[pageName] !== undefined) {
       document
         .querySelectorAll(".nav-tab")
@@ -1092,10 +1086,18 @@ class DyslexiaAssistant {
   }
 
   displayBookmarks() {
+    const list = document.getElementById("bookmarksList");
+    if (!list) return;
+
+    if (!this.currentDoc) {
+      list.innerHTML =
+        '<p style="color: var(--text-muted); font-size: 14px;">📂 Load a document to view bookmarks.</p>';
+      return;
+    }
+
     const docBookmarks = this.bookmarks.filter(
       (bm) => bm.docId === this.currentDoc.id,
     );
-    const list = document.getElementById("bookmarksList");
 
     if (docBookmarks.length === 0) {
       list.innerHTML =
@@ -1215,6 +1217,7 @@ class DyslexiaAssistant {
   // READING STATISTICS
 
   startReadingSession() {
+    if (this.readingStartTime) return;
     this.readingStartTime = Date.now();
     console.log("📖 Reading session started");
   }
@@ -1496,4 +1499,20 @@ class DyslexiaAssistant {
 document.addEventListener("DOMContentLoaded", () => {
   window.app = new DyslexiaAssistant();
   console.log("✨ Dyslexia Assistant loaded successfully!");
+
+  // ── Auth bootstrap (must run after window.app is set) ──
+  window.authManager = new AuthManager();
+  window.authUI      = new AuthUI(window.authManager);
+
+  // Patch switchPage to refresh profile data when navigated to
+  const _origSwitchPage = window.app.switchPage.bind(window.app);
+  window.app.switchPage = function(page) {
+    _origSwitchPage(page);
+    if (page === 'profile' && window.authUI) {
+      window.authUI.populateProfile();
+    }
+  };
+
+  // Show auth overlay or restore header for returning users
+  window.authUI.init();
 });
